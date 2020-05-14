@@ -1,13 +1,12 @@
 Package: mzDataTable
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Import and convert raw mass spectrometry data formats 
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Author: Patrick Brophy 
+Maintainer: Patrick Brophy <patrickbrophy2011@gmail.com>
+Description: A set of functions for importing mzML/mzXML data into R as a data.table and converting to a number of on-disk formats (.csv, disk.frame)
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 biocViews: 
-Imports: data.table, mzR, BiocParallel, parallel
+Imports: data.table, disk.table, mzR, BiocParallel, parallel
