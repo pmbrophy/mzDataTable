@@ -23,20 +23,10 @@ mzML2diskFrame <- function(path, diskFramePath, scans = NULL, chunkSize = NULL){
   #Link to the file
   file <- mzR::openMSfile(filename = path, verbose = TRUE)
 
-  #Get Number of scans
-  if(is.null(scans)){
-    nScans <- mzR::runInfo(file)$scanCount
-    scans <- c(1:nScans)
-  }else{
-    nScans <- length(scans)
-  }
-
-  #Split scans into chunks
-  if(is.null(chunkSize)){
-    chunkSize <- nScans
-  }
-  nGroups <- ceiling(nScans/chunkSize)
-  scanChunks <- splitIndex(index = scans, nGroups = nGroups, randomize = FALSE)$groups
+  #Group the scans into chunks
+  scanChunks <- .scanChunker(scans = scans,
+                             mzRfilePointer = file,
+                             chunkSize = chunkSize)
 
   #Setup disk.frame backend
   disk.frame::setup_disk.frame()
@@ -60,14 +50,6 @@ mzML2diskFrame <- function(path, diskFramePath, scans = NULL, chunkSize = NULL){
 
 #Import data using mzML2dataTable() and write results to .csv, appending results after the first import
 .mzML2diskFrameChunk <- function(path, diskFrame, scans = NULL){
-  #Print Statments: IMPORT
-  if(is.null(scans)){
-    print("Importing all scans")
-  }else{
-    scanMin <- min(scans)
-    scanMax <- max(scans)
-    print(paste("Importing scans from:", scanMin, "to", scanMax))
-  }
 
   dt <- mzML2dataTable(path = path, scans = scans)
 
@@ -75,6 +57,9 @@ mzML2diskFrame <- function(path, diskFramePath, scans = NULL, chunkSize = NULL){
   if(is.null(scans)){
     print("Writing all scans to disk.frame")
   }else{
+    scanMin <- min(scans)
+    scanMax <- max(scans)
+
     print(paste("Writing scans from:", scanMin, "to", scanMax, "to disk.frame"))
   }
 

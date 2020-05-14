@@ -1,3 +1,17 @@
+#collection of functions for internal use in converting mzML files to other formats
+
+#' Break sets of ms scans into indexed chunks for multi-import methods
+#'
+#' @param scans A numeric vector of all of the scan indices to be imported
+#' @param mzRfilePointer A mzR pointer object linking to the file to be
+#'   converted
+#' @param chunkSize The number of scans to be processed at a time - actual
+#'   import size will be aproximately the size of chunkSize
+#'
+#' @return a list object containing the group indices and order of those indicies. See splitIndex.
+#' @export
+#'
+#' @examples
 .scanChunker <- function(scans, mzRfilePointer, chunkSize){
   #Get Number of scans
   if(is.null(scans)){

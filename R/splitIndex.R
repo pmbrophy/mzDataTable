@@ -39,20 +39,20 @@ splitIndex <- function(index, nGroups, randomize = FALSE){
   groups <- mapply(FUN = seq, from = groupStarts, to = groupStops, by = 1, SIMPLIFY = FALSE)
 
   #randomized group indexs
-  groups_i <- mapply(FUN = indexFromVector, indexLocs = groups, MoreArgs = list(index_i), SIMPLIFY = FALSE)
+  groups_i <- mapply(FUN = .indexFromVector, indexLocs = groups, MoreArgs = list(index_i), SIMPLIFY = FALSE)
 
   if(randomize){
     #Using randomized group indexs, get the actual index values
-    groups <- mapply(FUN = indexFromVector, indexLocs = groups_i, MoreArgs = list(index), SIMPLIFY = FALSE)
+    groups <- mapply(FUN = .indexFromVector, indexLocs = groups_i, MoreArgs = list(index), SIMPLIFY = FALSE)
   }else{
     #Ordered implementation
-    groups <- mapply(FUN = indexFromVector, indexLocs = groups, MoreArgs = list(index), SIMPLIFY = FALSE)
+    groups <- mapply(FUN = .indexFromVector, indexLocs = groups, MoreArgs = list(index), SIMPLIFY = FALSE)
   }
 
   list(groups = groups, groupIndex = groups_i)
 }
 
 #extract index locations from a vector
-indexFromVector <- function(indexLocs, vec){
+.indexFromVector <- function(indexLocs, vec){
   vec[indexLocs]
 }

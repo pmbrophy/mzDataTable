@@ -15,6 +15,7 @@ mzML2dataTable <- function(path, scans = NULL, header = NULL){
   #Link to the file
   if(is.character(path)){
     if(file.exists(path)){
+      #path is character type and the file exists -- Establish mzR pointer
       file <- mzR::openMSfile(filename = path, verbose = TRUE)
     }else{
       stop("path leads to non-existent file")
@@ -27,6 +28,8 @@ mzML2dataTable <- function(path, scans = NULL, header = NULL){
 
   #Import peak data and optioncally import header data using mzR interface
   if(is.null(scans)){
+    print("Importing all scans")
+
     data <- mzR::peaks(object = file)
     if(is.null(header)){
       header <- mzR::header(object = file)
@@ -35,7 +38,12 @@ mzML2dataTable <- function(path, scans = NULL, header = NULL){
       stop("header provided is of different length than imported data")
     }
   }else{
+    scanMin <- min(scans)
+    scanMax <- max(scans)
+    print(paste("Importing scans from:", scanMin, "to", scanMax))
+
     data <- mzR::peaks(object = file, scans = scans)
+
     if(is.null(header)){
       header <- mzR::header(object = file, scans = scans)
     }else if(!all(header$seqNum %in% scans)){

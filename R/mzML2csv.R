@@ -24,20 +24,10 @@ mzML2csv <- function(path, outputPath, scans = NULL, chunkSize = 100){
   #Link to the file
   file <- mzR::openMSfile(filename = path, verbose = TRUE)
 
-  #Get Number of scans
-  if(is.null(scans)){
-    nScans <- mzR::runInfo(file)$scanCount
-    scans <- c(1:nScans)
-  }else{
-    nScans <- length(scans)
-  }
-
-  #Split scans into chunks
-  if(is.null(chunkSize)){
-    chunkSize <- nScans
-  }
-  nGroups <- ceiling(nScans/chunkSize)
-  scanChunks <- splitIndex(index = scans, nGroups = nGroups, randomize = FALSE)$groups
+  #Group the scans into chunks
+  scanChunks <- .scanChunker(scans = scans,
+                             mzRfilePointer = file,
+                             chunkSize = chunkSize)
 
   #Write file
   writeResult <- mapply(FUN = .mzML2csvChunk,
@@ -54,14 +44,6 @@ mzML2csv <- function(path, outputPath, scans = NULL, chunkSize = 100){
 #Import data using mzML2dataTable() and write results to .csv, appending results after the first import
 #Internal function to be used by mzML2csv in an mapply function.
 .mzML2csvChunk <- function(path, outputPath, scans = NULL){
-  #Print Statments: IMPORT
-  if(is.null(scans)){
-    print("Importing all scans")
-  }else{
-    scanMin <- min(scans)
-    scanMax <- max(scans)
-    print(paste("Importing scans from:", scanMin, "to", scanMax))
-  }
 
   dt <- mzML2dataTable(path = path, scans = scans)
 
@@ -69,6 +51,9 @@ mzML2csv <- function(path, outputPath, scans = NULL, chunkSize = 100){
   if(is.null(scans)){
     print("Writing all scans to .csv file")
   }else{
+    scanMin <- min(scans)
+    scanMax <- max(scans)
+
     print(paste("Writing scans from:", scanMin, "to", scanMax, "to .csv file"))
   }
 
