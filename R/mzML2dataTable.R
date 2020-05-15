@@ -11,6 +11,8 @@
 #' @export
 #'
 #' @examples
+#'
+
 mzML2dataTable <- function(path, scans = NULL, header = NULL){
   #Link to the file
   if(is.character(path)){

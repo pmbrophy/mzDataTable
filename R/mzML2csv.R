@@ -11,11 +11,13 @@
 #'   Default is 100. If NULL, imports all scans in single operation and you will
 #'   probably run out of memory.
 #'
-#' @return
+#' @return the results from writing the .csv file
 #'
 #' @export
 #'
 #' @examples
+#'
+
 mzML2csv <- function(path, outputPath, scans = NULL, chunkSize = 100){
   if(file.exists(outputPath)){
     stop("OutputPath leads to file location that already exists")

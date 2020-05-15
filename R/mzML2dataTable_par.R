@@ -3,11 +3,13 @@
 #' @param path a system path to the .mzML file
 #' @param scans A numeric specifying which scans to return. Optional argument.
 #'   If ommited, the requested data for all peaks is returned.
+#' @param nthreads the number of threads to use for parallel read
 #'
-#' @return
-#' @export
+#' @return a data.table
 #'
 #' @examples
+#'
+
 mzML2dataTable_par <- function(path, scans = NULL, nthreads = NULL){
   #Link to the file
   file <- mzR::openMSfile(filename = path, verbose = TRUE)
@@ -21,12 +23,12 @@ mzML2dataTable_par <- function(path, scans = NULL, nthreads = NULL){
   }
 
   #Generates list of vectors for group indexing
-  indexList <- splitIndex(nCores = parallel::detectCores(), index = scans)
+  indexList <- splitIndex(index = scans, nGroups = nthreads, randomize = TRUE)
   scanNumbers <-indexList$groups      #actual scan numbers randomized in their groups
   scanIndex <- indexList$groupIndex   #index of the scan number
 
   #Split the header by the scanIndex
-  header <- mapply(FUN = splitDFbyVectorList,
+  header <- mapply(FUN = .splitDFbyVectorList,
                    vectorList = scanIndex,
                    MoreArgs = list(header),
                    SIMPLIFY = FALSE)
@@ -40,7 +42,4 @@ mzML2dataTable_par <- function(path, scans = NULL, nthreads = NULL){
   data.table::rbindlist(l)
 }
 
-splitDFbyVectorList <- function(df, vectorList){
-  df[vectorList, ]
-}
 

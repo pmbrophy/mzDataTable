@@ -12,6 +12,8 @@
 #' @export
 #'
 #' @examples
+#'
+
 .scanChunker <- function(scans, mzRfilePointer, chunkSize){
   #Get Number of scans
   if(is.null(scans)){
@@ -29,5 +31,18 @@
   scanChunks <- splitIndex(index = scans, nGroups = nGroups, randomize = FALSE)$groups
 
   scanChunks
+}
+
+#' Internal function to be used by mapply for splitting a data.frame/data.table
+#' by a list of index values
+#'
+#' @param df a data frame to be split by row index
+#' @param vectorList rows to return
+#'
+#' @return retuns a data.frame/data.table subset
+#'
+
+.splitDFbyVectorList <- function(df, vectorList){
+  df[vectorList, ]
 }
 

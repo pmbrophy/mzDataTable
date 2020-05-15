@@ -11,10 +11,13 @@
 #'   Default is 100. If NULL, imports all scans in single operation and you will
 #'   probably run out of memory.
 #'
-#' @return
+#' @return Returns a disk.frame reference object.
+#'
 #' @export
 #'
 #' @examples
+#'
+
 mzML2diskFrame <- function(path, diskFramePath, scans = NULL, chunkSize = NULL){
   if(dir.exists(diskFramePath)){
     stop("diskFramePath leads to directory location that already exists")
