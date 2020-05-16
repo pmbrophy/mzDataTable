@@ -1,3 +1,6 @@
+#' @title Convert mz data to disk.frame
+#'
+#' @description
 #' Convert .mzML file to disk.frame using mzR, data.table, and disk.frame
 #'
 #' @param path path to the mzML file

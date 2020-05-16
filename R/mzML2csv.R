@@ -1,4 +1,8 @@
-#' Convert .mzML file to CSV using mzR and data.table
+#' @title Convert .mzML file to CSV
+#'
+#' @description Convert mz data to a CSV file using mzR and data.table.
+#'   Individual scans can be indexed and selectively extracted. The operation
+#'   can be performed in chunks or all at once.
 #'
 #' @param path path to the mzML file
 #' @param outputPath path and fileName.csv specifying write location of .csv
