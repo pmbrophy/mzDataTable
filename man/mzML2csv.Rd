@@ -2,7 +2,7 @@
 % Please edit documentation in R/mzML2csv.R
 \name{mzML2csv}
 \alias{mzML2csv}
-\title{Convert .mzML file to CSV using mzR and data.table}
+\title{Convert .mzML file to CSV}
 \usage{
 mzML2csv(path, outputPath, scans = NULL, chunkSize = 100)
 }
@@ -25,7 +25,9 @@ probably run out of memory.}
 the results from writing the .csv file
 }
 \description{
-Convert .mzML file to CSV using mzR and data.table
+Convert mz data to a CSV file using mzR and data.table.
+  Individual scans can be indexed and selectively extracted. The operation
+  can be performed in chunks or all at once.
 }
 \examples{
 

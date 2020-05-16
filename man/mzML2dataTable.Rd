@@ -20,7 +20,7 @@ NULL.}
 a data.table
 }
 \description{
-Import a mzML file and format the data into a data.table
+
 }
 \examples{
 

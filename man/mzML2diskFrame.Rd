@@ -2,7 +2,7 @@
 % Please edit documentation in R/mzML2diskFrame.R
 \name{mzML2diskFrame}
 \alias{mzML2diskFrame}
-\title{Convert .mzML file to disk.frame using mzR, data.table, and disk.frame}
+\title{Convert mz data to disk.frame}
 \usage{
 mzML2diskFrame(path, diskFramePath, scans = NULL, chunkSize = NULL)
 }

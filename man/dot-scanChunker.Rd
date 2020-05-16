@@ -2,7 +2,7 @@
 % Please edit documentation in R/mzML2_OtherFormat_Internals.R
 \name{.scanChunker}
 \alias{.scanChunker}
-\title{Break sets of ms scans into indexed chunks for multi-import methods}
+\title{Scan Chunker}
 \usage{
 .scanChunker(scans, mzRfilePointer, chunkSize)
 }
@@ -22,5 +22,7 @@ a list object containing the group indices and order of those indicies. See spli
 Break sets of ms scans into indexed chunks for multi-import methods
 }
 \examples{
-
+\dontrun{
+chunks <- .scanChunker(scans = c(1:10), chunkSize = 2)
+}
 }
