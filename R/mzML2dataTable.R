@@ -1,4 +1,6 @@
-#' Import a mzML file and format the data into a data.table
+#' @title Import a mzML file and format the data into a data.table
+#'
+#' @description
 #'
 #' @param path Either a system path to the .mzML file or mzR pointer object
 #' @param scans A numeric vecotr specifying which scans to return. Optional
@@ -12,6 +14,8 @@
 #'
 #' @examples
 #'
+
+#TODO: check header for empty/NA fields
 
 mzML2dataTable <- function(path, scans = NULL, header = NULL){
   #Link to the file
@@ -45,6 +49,10 @@ mzML2dataTable <- function(path, scans = NULL, header = NULL){
     print(paste("Importing scans from:", scanMin, "to", scanMax))
 
     data <- mzR::peaks(object = file, scans = scans)
+
+    if(length(scans) == 1){
+      data <- list(data)
+    }
 
     if(is.null(header)){
       header <- mzR::header(object = file, scans = scans)
@@ -81,36 +89,33 @@ mzML2dataTable <- function(path, scans = NULL, header = NULL){
   data.table::merge.data.table(x = dt, y = header, by = "seqNum")
 }
 
-.formatHeader <- function(headerDF){
+#' @title Format header
+#'
+#' @description Format a header returned by mzR::header() by removing empty
+#' columns, processing spectrumId column, and converting to data.table
+#'
+#' @param headerDF the header returned by mzR::header()
+#' @param removeEmptyCols Default is TRUE. Set FALSE if you want empty columns returned
+#'
+#' @return Returns a data.table
+#'
+#' @export
+#'
+#' @examples
+#'
+
+.formatHeader <- function(headerDF, removeEmptyCols = TRUE){
   if(!is.data.frame(headerDF)){
-    stop("Header returned from mzR is not a data.frame")
+    headerDF <- as.data.frame(headerDF)
   }
 
-  #Convert header to data.table
-  headerDF <- data.table::as.data.table(headerDF)
-
-  #Extract numeric values
-  m <- gsub(pattern = "[[:alpha:]]+=", replacement = "", x = headerDF$spectrumId)
-  m <- strsplit(m, split = " ")
-  m <- lapply(X = m, FUN = as.numeric)
-  m <- do.call(rbind, m)
-  m <- data.table::as.data.table(m)
-
-  #Extract names of numeric values
-  n <- gsub(pattern = "=[[:digit:]]+", replacement = "", x = headerDF$spectrumId)
-  n <- unique(n)
-  if(length(n) != 1){
-    stop("spectrumId contains non-uniform formatting")
-  }
-  n <- strsplit(x = unique(n), split = " ")[[1]]
-
-  #Set names
-  currentNames <- names(m)
-  if(length(n) != length(currentNames)){
-    stop("spectrumId names differ in length from extracted data tyeps")
+  #Remove empty columns
+  if(removeEmptyCols){
+    headerDF <- .dropEmptyCols(df = headerDF)
   }
 
-  data.table::setnames(x = m, new = n, old = currentNames)
+  #Extract numeric values from spectrumId
+  m <- .getNumFromSpectrumId(spectrumId = headerDF$spectrumId)
 
   data.table::data.table(headerDF, m)
 }
