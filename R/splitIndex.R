@@ -28,7 +28,9 @@ splitIndex <- function(index, nGroups, randomize = FALSE){
 
   #randomized index_i for the vector index
   index_i <- c(1:indexLength)
-  index_i <- sample(index_i)
+  if(randomize){
+    index_i <- sample(index_i)
+  }
 
   #Calcualte the groups
   groupSize <- indexLength %/% nGroups
