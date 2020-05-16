@@ -12,6 +12,19 @@
 #' @return returns a data.frame
 #'
 #' @examples
+#' \dontrun{
+#' df <- data.frame(c1 = c(1:10),
+#'                  c2 = rnorm(n = 10, mean = 1, sd = 1),
+#'                  c3 = rep("a", 10),
+#'                  c4 = rep(NA, 10),
+#'                  c5 = rep(NaN, 10),
+#'                  C6 = c(1:10))
+#'
+#' ncol(df)
+#' df_out <- .dropEmptyCols(df = df)
+#' ncol(df_out)
+#' }
+#'
 #'
 
 .dropEmptyCols <- function(df){
@@ -36,11 +49,16 @@
 #' @return a data.frame with column names
 #'
 #' @examples
+#' \dontrun{
+#' vec <- c("name1=10 name2=2 name3=333")
+#' nums <- .getNumFromSpectrumId(spectrumId = vec)
+#' nums
+#' }
 #'
 
 .getNumFromSpectrumId <- function(spectrumId){
   #Extract numeric values from spectrumId strings
-  m <- gsub(pattern = "[[:alpha:]]+=", replacement = "", x = spectrumId)
+  m <- gsub(pattern = "[[:alnum:]]+=", replacement = "", x = spectrumId)
   m <- strsplit(m, split = " ")
   m <- lapply(X = m, FUN = as.numeric)
   m <- do.call(rbind, m)
@@ -79,12 +97,14 @@
 #' @return a list object containing the group indices and order of those indicies. See splitIndex.
 #'
 #' @examples
-#'
+#' \dontrun{
+#' chunks <- .scanChunker(scans = c(1:10), chunkSize = 2)
+#' }
 
 .scanChunker <- function(scans, mzRfilePointer, chunkSize){
   #Get Number of scans
   if(is.null(scans)){
-    nScans <- mzR::runInfo(file)$scanCount
+    nScans <- mzR::runInfo(mzRfilePointer)$scanCount
     scans <- c(1:nScans)
   }else{
     nScans <- length(scans)
@@ -110,6 +130,16 @@
 #' @param vectorList rows to return
 #'
 #' @return retuns a data.frame/data.table subset
+#'
+#' @examples
+#' \dontrun{
+#' dat <- data.frame(col1 = c(1:10), col2 = c(21:30))
+#' vecList <- list(c(1:3), c(6:8), c(1:5))
+#' split.dat <- mapply(FUN = .splitDFbyVectorList,
+#'                    vectorList = vecList,
+#'                    MoreArgs = list(dat),
+#'                    SIMPLIFY = FALSE)
+#' }
 #'
 
 .splitDFbyVectorList <- function(df, vectorList){
