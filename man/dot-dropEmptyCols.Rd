@@ -30,5 +30,4 @@ df_out <- .dropEmptyCols(df = df)
 ncol(df_out)
 }
 
-
 }

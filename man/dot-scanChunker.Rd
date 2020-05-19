@@ -25,4 +25,5 @@ Break sets of ms scans into indexed chunks for multi-import methods
 \dontrun{
 chunks <- .scanChunker(scans = c(1:10), chunkSize = 2)
 }
+
 }

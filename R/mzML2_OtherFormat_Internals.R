@@ -25,7 +25,6 @@
 #' ncol(df_out)
 #' }
 #'
-#'
 
 .dropEmptyCols <- function(df){
   #Check for cols containing all na
@@ -100,6 +99,7 @@
 #' \dontrun{
 #' chunks <- .scanChunker(scans = c(1:10), chunkSize = 2)
 #' }
+#'
 
 .scanChunker <- function(scans, mzRfilePointer, chunkSize){
   #Get Number of scans

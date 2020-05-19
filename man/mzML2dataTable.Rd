@@ -22,6 +22,3 @@ a data.table
 \description{
 
 }
-\examples{
-
-}

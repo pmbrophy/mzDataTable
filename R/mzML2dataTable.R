@@ -12,8 +12,6 @@
 #' @return a data.table
 #' @export
 #'
-#' @examples
-#'
 
 #TODO: check header for empty/NA fields
 
@@ -98,10 +96,6 @@ mzML2dataTable <- function(path, scans = NULL, header = NULL){
 #' @param removeEmptyCols Default is TRUE. Set FALSE if you want empty columns returned
 #'
 #' @return Returns a data.table
-#'
-#' @export
-#'
-#' @examples
 #'
 
 .formatHeader <- function(headerDF, removeEmptyCols = TRUE){

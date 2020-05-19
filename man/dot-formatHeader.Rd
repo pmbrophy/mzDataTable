@@ -18,6 +18,3 @@ Returns a data.table
 Format a header returned by mzR::header() by removing empty
 columns, processing spectrumId column, and converting to data.table
 }
-\examples{
-
-}
