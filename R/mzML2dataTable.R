@@ -35,6 +35,7 @@ mzML2dataTable <- function(path, scans = NULL, header = NULL){
     print("Importing all scans")
 
     data <- mzR::peaks(object = file)
+    scans <- c(1:length(data))
     if(is.null(header)){
       header <- mzR::header(object = file)
     }else if(length(data) != nrow(header)){
