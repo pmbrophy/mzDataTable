@@ -10,10 +10,13 @@ Encoding: UTF-8
 LazyData: true
 biocViews: 
 Imports: 
-  disk.frame, 
-  mzR, 
-  Rfast, 
-  testthat
+    disk.frame,
+    mzR,
+    Rfast,
+    testthat,
+    Rcpp
 Depends: 
   data.table
 RoxygenNote: 7.1.0
+LinkingTo: 
+    Rcpp
