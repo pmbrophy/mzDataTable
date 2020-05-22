@@ -33,6 +33,79 @@ indexMasterSpectrum <- function(dt, ppmTol, isCentroid = TRUE){
   data.table::data.table(dt, dt_grid)
 }
 
+#' Calculate global m/z grid for profile mode data
+#'
+#' @param mz a vector of m/z values to be clustered
+#'
+#' @return a data.table
+#'
+
+.normProfileMz <- function(mz){
+  if(!is.numeric(mz)){
+    stop("mz is not numeric")
+  }
+  #Construct a data.table of unique mz values and index
+  mz <- data.table::data.table(mz = mz, index = c(1:length(mz)))
+  mzGrid <- Rfast::sort_unique(x = mz$mz)
+  mzGrid_index <- c(1:length(mzGrid))
+
+  #data.table results
+  mzGrid <- data.table::data.table(mz = mzGrid, mzGrid_index = mzGrid_index)
+
+  #Combine Results
+  mz <- data.table::merge.data.table(x = mz, y = mzGrid, by = "mz")
+
+  #reorder to orignal input
+  data.table::setkey(x = mz, "index", physical = TRUE)
+.
+  #Remove index
+  index <- NULL
+  mz[, index := NULL]
+  mz
+}
+
+#' C++ Version: Calculate global m/z grid for centroids
+#'
+#' @param mz a vector of m/z values to be clustered
+#' @param ppmTol tolerance for cluster width in parts per million
+#'
+#' @return a data.table
+#'
+#' @examples
+#' \dontrun{
+#' mzs <- c(100.001, 100.002, 100.003, 100.01, 100.011, 100.012, 100.03)
+#' dt <- normCentroidMz(mz = mzs, ppmTol = 10)
+#' }
+#'
+
+.C_normCentroidMz <- function(mz, ppmTol){
+  if(!is.numeric(mz)){
+    stop("mz is not numeric")
+  }
+
+  mz_length <- length(mz)
+  index <- c(1:mz_length)
+  tol <- ppmTol*(10^(-6))
+
+  #Calculate all uppper limits assuming each mz is unique mzGrid
+  mz_upperLimit <- mz*tol + mz
+
+  #index and sort
+  mz <- data.table::data.table(mz = mz, index = index, mz_upperLimit = mz_upperLimit)
+  data.table::setkey(x = mz, "mz", physical = TRUE)
+
+  #Call to Rcpp
+  mz_grid <- C_normCentroidMz(mz_vector = mz$mz, mz_upperLimit_vector = mz$mz_upperLimit)
+
+  #Return
+  mz[, mz_upperLimit := NULL]
+  mz[, c("mzGrid", "mzGrid_index", "mzGrid_upperLimit") := list(mz_grid[[1]],  mz_grid[[2]], mz_grid[[3]])]
+  data.table::setkey(x = mz, "index", physical = TRUE)
+  mz[, index := NULL]
+
+  mz
+}
+
 #' DEPRICATED: Calculate global m/z grid for centroids
 #'
 #' @param mz a vector of m/z values to be clustered
@@ -60,7 +133,7 @@ indexMasterSpectrum <- function(dt, ppmTol, isCentroid = TRUE){
   mz_upperLimit <- mz*tol + mz
 
   #index and sort
-  mz <- data.table(mz = mz, index = index, mz_upperLimit = mz_upperLimit)
+  mz <- data.table::data.table(mz = mz, index = index, mz_upperLimit = mz_upperLimit)
   data.table::setkey(x = mz, "mz", physical = TRUE)
 
   #output results
@@ -102,86 +175,8 @@ indexMasterSpectrum <- function(dt, ppmTol, isCentroid = TRUE){
   }
   #Return
   mz[, mz_upperLimit := NULL]
-  mz[, c("mzGrid", "mzGrid_index", "mzGrid_upperLimit") := .(mzGrid,  mzGrid_index, mzGrid_upperLimit)]
+  mz[, c("mzGrid", "mzGrid_index", "mzGrid_upperLimit") := list(mzGrid,  mzGrid_index, mzGrid_upperLimit)]
   data.table::setkey(x = mz, "index", physical = TRUE)
   mz[, index := NULL]
-  mz
-}
-
-#' Calculate global m/z grid for profile mode data
-#'
-#' @param mz a vector of m/z values to be clustered
-#'
-#' @return a data.table
-#'
-
-.normProfileMz <- function(mz){
-  if(!is.numeric(mz)){
-    stop("mz is not numeric")
-  }
-  #Construct a data.table of unique mz values and index
-  mz <- data.table::data.table(mz = mz, index = c(1:length(mz)))
-  mzGrid <- Rfast::sort_unique(x = mz$mz)
-  mzGrid_index <- c(1:length(mzGrid))
-
-  #data.table results
-  mzGrid <- data.table::data.table(mz = mzGrid, mzGrid_index = mzGrid_index)
-
-  #Combine Results
-  mz <- data.table::merge.data.table(x = mz, y = mzGrid, by = "mz")
-
-  #reorder to orignal input
-  data.table::setkey(x = mz, "index", physical = TRUE)
-.
-  #Remove index
-  index <- NULL
-  mz[, index := NULL]
-  mz
-}
-
-
-
-
-#' C++ Version: Calculate global m/z grid for centroids
-#'
-#' @param mz a vector of m/z values to be clustered
-#' @param ppmTol tolerance for cluster width in parts per million
-#'
-#' @return a data.table
-#'
-#' @examples
-#' \dontrun{
-#' mzs <- c(100.001, 100.002, 100.003, 100.01, 100.011, 100.012, 100.03)
-#' dt <- normCentroidMz(mz = mzs, ppmTol = 10)
-#' }
-#'
-
-.C_normCentroidMz <- function(mz, ppmTol){
-  if(!is.numeric(mz)){
-    stop("mz is not numeric")
-  }
-
-  mz_length <- length(mz)
-  index <- c(1:mz_length)
-  tol <- ppmTol*(10^(-6))
-
-  #Calculate all uppper limits assuming each mz is unique mzGrid
-  mz_upperLimit <- mz*tol + mz
-
-  #index and sort
-  mz <- data.table(mz = mz, index = index, mz_upperLimit = mz_upperLimit)
-  data.table::setkey(x = mz, "mz", physical = TRUE)
-
-  #Call to Rcpp
-  mz_grid <- C_normCentroidMz(mz_vector = mz$mz, mz_upperLimit_vector = mz$mz_upperLimit)
-
-  #Return
-  #mz[, mz_upperLimit := NULL]
-  #mz[, c("mzGrid", "mzGrid_index", "mzGrid_upperLimit") := .(mz_grid[[1]],  mz_grid[[2]], mz_grid[[3]])]
-  mz <- data.table(mz = mz$mz, index = mz$index, mzGrid = mz_grid[[1]], mzGrid_index = mz_grid[[2]])
-
-  data.table::setkey(x = mz, "index", physical = TRUE)
-
-  #mz[, index := NULL]
   mz
 }
