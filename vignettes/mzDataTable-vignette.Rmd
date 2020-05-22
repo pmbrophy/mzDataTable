@@ -1,0 +1,44 @@
+---
+title: "Basic data manipulation with mzDataTable"
+author: "Patrick Brophy"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{mzDataTable-vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+The [mzDataTable](https://github.com/pmbrophy/mzDataTable) package aims to provide methods get .mzML/.mzXML data into [data.table](https://cran.r-project.org/web/packages/data.table/) format through the use of [mzR](https://www.bioconductor.org/packages/release/bioc/html/mzR.html). There are three conversion functions provided:
+
+1. `mzML2dataTable` reads an .mzML/.mzXML file into memory as a `data.table`
+2. `mzML2csv` converts an .mzML/.mzXML file to a .csv file by first reading chunks of the .mzML/.mzXML file into memory as `data.table`s and sequentially writing them to the .csv file.
+3. `mzML2diskFrame` converts an .mzML/.mzXML file to a `disk.frame` directory by first reading chunks of the .mzML/.mzXML file into memory as `data.table`s and sequentially writing them as `disk.frame` chunks. This provides efficent on-disk manipulation of raw mass spectrometry data.
+
+# Import and Conversion Functions
+## The mzML2dataTable Function: get data into memory
+
+We can use the mock .mzML data provided in the [mzDataTable](https://github.com/pmbrophy/mzDataTable) package as an example. 
+```{r setup}
+#load the library and data.table
+library(mzDataTable)
+library(data.table)
+
+dataPath <- system.file("extdata", "example.mzML", package="mzDataTable", mustWork = TRUE)
+
+#Read the .mzML file into memory as a data.table
+dt <- mzML2dataTable(path = dataPath)
+
+is.data.table(dt)
+
+head(dt)
+```
