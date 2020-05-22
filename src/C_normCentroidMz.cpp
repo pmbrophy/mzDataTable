@@ -1,8 +1,6 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
-
-
 //' Rcpp function for normCentroidMz
 //' SEXP
 //' @param mz_vector A sorted numeric vecotor
