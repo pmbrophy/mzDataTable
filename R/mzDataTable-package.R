@@ -1,8 +1,6 @@
 ## usethis namespace: start
 #' @useDynLib mzDataTable, .registration = TRUE
-## usethis namespace: end
-NULL
-## usethis namespace: start
 #' @importFrom Rcpp sourceCpp
+#' @importFrom data.table ':='
 ## usethis namespace: end
 NULL
