@@ -105,6 +105,8 @@ indexMasterSpectrum <- function(dt, ppmTol, isCentroid = TRUE){
   data.table::setkey(x = mz, "index", physical = TRUE)
   mz[, index := NULL]
 
+  mz$mzGrid_index <- mz$mzGrid_index + 1
+
   mz
 }
 
