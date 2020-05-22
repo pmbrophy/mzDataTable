@@ -4,29 +4,43 @@
 \alias{mzML2diskFrame}
 \title{Convert mz data to disk.frame}
 \usage{
-mzML2diskFrame(path, diskFramePath, scans = NULL, chunkSize = NULL)
+mzML2diskFrame(path, diskFramePath, scans = NULL, chunkSize = 100)
 }
 \arguments{
 \item{path}{path to the mzML file}
 
-\item{diskFramePath}{path and fileName.csv specifying write location of .csv
-file}
+\item{diskFramePath}{path and fileName.df specifying write location of .df
+directory}
 
 \item{scans}{Optional parameter. Provide a numeric vector to import select
-scans and write to a .csv file. If not provided, the whole file is
+scans and write to a data.frame. If not provided, the whole file is
 converted. Default is NULL.}
 
-\item{chunkSize}{number of scans to be extracted and written to a .csv file
-at a time. Useful for breaking up large data files and converting to .csv.
-Default is 100. If NULL, imports all scans in single operation and you will
-probably run out of memory.}
+\item{chunkSize}{number of scans to be extracted and written to the
+disk.frame at a time. Useful for breaking up large data files and
+converting to disk.frame. Default is 100. If NULL, imports all scans in
+single operation and you will probably run out of memory.}
 }
 \value{
 Returns a disk.frame reference object.
 }
 \description{
-Convert .mzML file to disk.frame using mzR, data.table, and disk.frame
+Convert .mzML file to disk.frame using mzR, data.table, and
+  disk.frame
 }
 \examples{
+\dontrun{
+#read .mzML file from system path and write to disk.frame
+#100 scans (default) at a time
+mzML2diskFrame(path = path_2_mzML,
+               diskFramePath = "dfPath.df")
+
+#read scans 100-200 from .mzML file specified by a system path
+#and write to disk.frame 20 scans at a time
+mzML2diskFrame(path = path_2_mzML,
+               diskFramePath = "dfPath.df",
+               scans = c(100:200),
+               chunkSize = 20)
+}
 
 }

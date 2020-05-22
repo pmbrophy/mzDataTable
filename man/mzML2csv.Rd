@@ -4,13 +4,12 @@
 \alias{mzML2csv}
 \title{Convert .mzML file to CSV}
 \usage{
-mzML2csv(path, outputPath, scans = NULL, chunkSize = 100)
+mzML2csv(path, csvPath, scans = NULL, chunkSize = 100)
 }
 \arguments{
 \item{path}{path to the mzML file}
 
-\item{outputPath}{path and fileName.csv specifying write location of .csv
-file}
+\item{csvPath}{path and fileName.csv specifying write location of .csv file}
 
 \item{scans}{Optional parameter. Provide a numeric vector to import select
 scans and write to a .csv file. If not provided, the whole file is
@@ -30,5 +29,13 @@ Convert mz data to a CSV file using mzR and data.table.
   can be performed in chunks or all at once.
 }
 \examples{
+\dontrun{ #read .mzML file from system path and write to .csv
+#100 scans (default) at a time mzML2diskFrame(path = path_2_mzML, csvPath =
+"csvPath.csv")
+
+#read scans 100-200 from .mzML file specified by a system path #and write to
+.csv 20 scans at a time mzML2diskFrame(path = path_2_mzML, diskFramePath =
+"dfPath.df", scans = c(100:200), chunkSize = 20)
+}
 
 }

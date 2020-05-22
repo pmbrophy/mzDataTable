@@ -22,3 +22,21 @@ a data.table
 \description{
 
 }
+\examples{
+\dontrun{
+#Typical use for user - import mzML/mzXML data as data.table
+dt <- mzML2dataTable(path = "mzML_path.mzML", scans = c(1:100))
+
+#Typical use for other functions in this package
+#-import mzML/mzXML data as data.table from mzR pointer
+mzML <- mzR::openMSfile(filename = "mzML_path.mzML")
+dt <- mzML2dataTable(path = mzML, scans = c(1:100))
+
+#-import mzML/mzXML scan data with previously imported header
+header <- mzR::header(object = mzML, scans = c(1:100))
+dt <- mzML2dataTable(path = mzML,
+                     scans = c(1:100),
+                     header = header)
+}
+
+}

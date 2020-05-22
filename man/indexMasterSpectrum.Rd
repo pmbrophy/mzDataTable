@@ -7,9 +7,11 @@
 indexMasterSpectrum(dt, ppmTol, isCentroid = TRUE)
 }
 \arguments{
-\item{isCentroid}{logical, default is `TRUE`. Are the spectra centroids?}
+\item{dt}{a data.table containing a column named mz}
 
-\item{mz}{a data.table containing a column named mz}
+\item{ppmTol}{the grouping tolerance in ppm}
+
+\item{isCentroid}{logical, default is `TRUE`. Are the spectra centroids?}
 }
 \value{
 Returns the original data.table also containing the the normalized
@@ -21,4 +23,5 @@ Index the m/z axis for a set of mass spectra. Function outputs
 }
 \examples{
 mz <- c(100, 100.01, 100.02, 100.021, 100.2, 100.21, 100.22, 100.22, 100.31)
+
 }

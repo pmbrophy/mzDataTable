@@ -11,12 +11,11 @@ LazyData: true
 biocViews: 
 Imports: 
     disk.frame,
-    mzR,
     Rfast,
     testthat,
-    Rcpp
-Depends: 
-  data.table
+    Rcpp,
+    mzR,
+    data.table
 RoxygenNote: 7.1.0
 LinkingTo: 
     Rcpp
