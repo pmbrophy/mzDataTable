@@ -11,7 +11,7 @@
 #'
 #' @return a data.table
 #' @export
-#' @example
+#' @examples
 #' \dontrun{
 #' #Typical use for user - import mzML/mzXML data as data.table
 #' dt <- mzML2dataTable(path = "mzML_path.mzML", scans = c(1:100))

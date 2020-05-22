@@ -3,7 +3,8 @@
 #' @description Index the m/z axis for a set of mass spectra. Function outputs
 #'   normalized m/z values and integer index values.
 #'
-#' @param mz a data.table containing a column named mz
+#' @param dt a data.table containing a column named mz
+#' @param ppmTol the grouping tolerance in ppm
 #' @param isCentroid logical, default is `TRUE`. Are the spectra centroids?
 #'
 #' @return Returns the original data.table also containing the the normalized
@@ -12,6 +13,7 @@
 #'
 #' @examples
 #' mz <- c(100, 100.01, 100.02, 100.021, 100.2, 100.21, 100.22, 100.22, 100.31)
+#'
 
 indexMasterSpectrum <- function(dt, ppmTol, isCentroid = TRUE){
   #Input checks
@@ -57,7 +59,7 @@ indexMasterSpectrum <- function(dt, ppmTol, isCentroid = TRUE){
 
   #reorder to orignal input
   data.table::setkey(x = mz, "index", physical = TRUE)
-.
+
   #Remove index
   index <- NULL
   mz[, index := NULL]

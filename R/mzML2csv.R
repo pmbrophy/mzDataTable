@@ -17,7 +17,7 @@
 #' @return the results from writing the .csv file
 #'
 #' @export
-#' @example
+#' @examples
 #' \dontrun{ #read .mzML file from system path and write to .csv
 #' #100 scans (default) at a time mzML2diskFrame(path = path_2_mzML, csvPath =
 #' "csvPath.csv")
