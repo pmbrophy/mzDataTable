@@ -79,7 +79,7 @@ mzML2diskFrame <- function(path, diskFramePath, scans = NULL, chunkSize = 100){
 #' @return NULL
 #'
 
-.mzML2diskFrameChunk <- function(path, diskFrame, scans = NULL){
+.mzML2diskFrameChunk <- function(path, diskFrame, scans){
 
   dt <- mzML2dataTable(path = path, scans = scans)
 
