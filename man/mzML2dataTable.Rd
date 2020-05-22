@@ -20,7 +20,9 @@ NULL.}
 a data.table
 }
 \description{
-
+Convert mzML/mzXML data files into data.tables. This function is
+  used by other converters in this package and provides flexible inputs - see
+  parameters for details.
 }
 \examples{
 \dontrun{
