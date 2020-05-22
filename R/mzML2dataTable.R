@@ -11,9 +11,23 @@
 #'
 #' @return a data.table
 #' @export
+#' @example
+#' \dontrun{
+#' #Typical use for user - import mzML/mzXML data as data.table
+#' dt <- mzML2dataTable(path = "mzML_path.mzML", scans = c(1:100))
 #'
-
-#TODO: check header for empty/NA fields
+#' #Typical use for other functions in this package
+#' #-import mzML/mzXML data as data.table from mzR pointer
+#' mzML <- mzR::openMSfile(filename = "mzML_path.mzML")
+#' dt <- mzML2dataTable(path = mzML, scans = c(1:100))
+#'
+#' #-import mzML/mzXML scan data with previously imported header
+#' header <- mzR::header(object = mzML, scans = c(1:100))
+#' dt <- mzML2dataTable(path = mzML,
+#'                      scans = c(1:100),
+#'                      header = header)
+#' }
+#'
 
 mzML2dataTable <- function(path, scans = NULL, header = NULL){
   #Link to the file
@@ -88,13 +102,14 @@ mzML2dataTable <- function(path, scans = NULL, header = NULL){
   data.table::merge.data.table(x = dt, y = header, by = "seqNum")
 }
 
-#' @title Format header
+#' @title Format header from mzR::header()
 #'
 #' @description Format a header returned by mzR::header() by removing empty
-#' columns, processing spectrumId column, and converting to data.table
+#'   columns, processing spectrumId column, and converting to data.table
 #'
 #' @param headerDF the header returned by mzR::header()
-#' @param removeEmptyCols Default is TRUE. Set FALSE if you want empty columns returned
+#' @param removeEmptyCols Default is TRUE. Set FALSE if you want empty columns
+#'   returned
 #'
 #' @return Returns a data.table
 #'
