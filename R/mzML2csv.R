@@ -5,8 +5,7 @@
 #'   can be performed in chunks or all at once.
 #'
 #' @param path path to the mzML file
-#' @param outputPath path and fileName.csv specifying write location of .csv
-#'   file
+#' @param csvPath path and fileName.csv specifying write location of .csv file
 #' @param scans Optional parameter. Provide a numeric vector to import select
 #'   scans and write to a .csv file. If not provided, the whole file is
 #'   converted. Default is NULL.
@@ -18,19 +17,26 @@
 #' @return the results from writing the .csv file
 #'
 #' @export
+#' @example
+#' \dontrun{ #read .mzML file from system path and write to .csv
+#' #100 scans (default) at a time mzML2diskFrame(path = path_2_mzML, csvPath =
+#' "csvPath.csv")
 #'
-#' @examples
+#' #read scans 100-200 from .mzML file specified by a system path #and write to
+#' .csv 20 scans at a time mzML2diskFrame(path = path_2_mzML, diskFramePath =
+#' "dfPath.df", scans = c(100:200), chunkSize = 20)
+#' }
 #'
 
-mzML2csv <- function(path, outputPath, scans = NULL, chunkSize = 100){
-  if(file.exists(outputPath)){
-    stop("OutputPath leads to file location that already exists")
+mzML2csv <- function(path, csvPath, scans = NULL, chunkSize = 100){
+  if(file.exists(csvPath)){
+    stop("csvPath leads to file location that already exists")
   }
 
   #Link to the file
   file <- mzR::openMSfile(filename = path, verbose = TRUE)
 
-  #Group the scans into chunks
+  #Generate index to group the scans into chunks
   scanChunks <- .scanChunker(scans = scans,
                              mzRfilePointer = file,
                              chunkSize = chunkSize)
@@ -39,7 +45,7 @@ mzML2csv <- function(path, outputPath, scans = NULL, chunkSize = 100){
   writeResult <- mapply(FUN = .mzML2csvChunk,
                         scans = scanChunks,
                         MoreArgs = list(path = file,
-                                        outputPath = outputPath),
+                                        csvPath = csvPath),
                         SIMPLIFY = FALSE)
   #Cleanup
   c <- gc()
@@ -47,9 +53,22 @@ mzML2csv <- function(path, outputPath, scans = NULL, chunkSize = 100){
   writeResult
 }
 
-#Import data using mzML2dataTable() and write results to .csv, appending results after the first import
-#Internal function to be used by mzML2csv in an mapply function.
-.mzML2csvChunk <- function(path, outputPath, scans = NULL){
+#' @title Write data.table of mzML/mzXML data to a .csv
+#'
+#' @description Internal function. Used by mzML2csv in an mapply function.
+#'   Import data using mzML2dataTable() and write results to .csv, appending
+#'   results after the first import.
+#'
+#' @param path path or mzR pointer to the mzML file
+#' @param csvPath path to a .csv file
+#' @param scans Provide a numeric vector to import select scans and write to a
+#'   .csv file. If not provided, the whole file is converted. Likely provided by
+#'   .scanChunker()
+#'
+#' @return NULL
+#'
+
+.mzML2csvChunk <- function(path, csvPath, scans){
 
   dt <- mzML2dataTable(path = path, scans = scans)
 
@@ -64,12 +83,12 @@ mzML2csv <- function(path, outputPath, scans = NULL, chunkSize = 100){
   }
 
   #Write the results to a csv file
-  if(file.exists(outputPath)){
+  if(file.exists(csvPath)){
     #append
-    data.table::fwrite(x = dt, file = outputPath, append = TRUE, row.names = FALSE, col.names = FALSE, scipen = 2)
+    data.table::fwrite(x = dt, file = csvPath, append = TRUE, row.names = FALSE, col.names = FALSE, scipen = 2)
   }else{
     #Create
-    data.table::fwrite(x = dt, file = outputPath, append = FALSE, row.names = FALSE, col.names = TRUE, scipen = 2)
+    data.table::fwrite(x = dt, file = csvPath, append = FALSE, row.names = FALSE, col.names = TRUE, scipen = 2)
   }
 
   remove(dt)
