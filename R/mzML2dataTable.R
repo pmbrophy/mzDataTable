@@ -1,6 +1,8 @@
 #' @title Import a mzML file and format the data into a data.table
 #'
-#' @description
+#' @description Convert mzML/mzXML data files into data.tables. This function is
+#'   used by other converters in this package and provides flexible inputs - see
+#'   parameters for details.
 #'
 #' @param path Either a system path to the .mzML file or mzR pointer object
 #' @param scans A numeric vecotr specifying which scans to return. Optional
