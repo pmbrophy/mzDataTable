@@ -16,7 +16,10 @@ getBPI_dt <- function(mzDt, normalize = FALSE){
   dt <- mzDt[, list(intensity = max(intensity), basePeak_mz = mz[which.max(intensity)]), by = list(seqNum, retentionTime)]
 
   if(normalize){
-    .normalizeSpectrum_dt(dt)
+    normIntensity <- .normalizeSpectrum_dt(dt)
+    #Replace summed intensity with normalized summed intensity
+    dt[, intensity := NULL]
+    dt[, intensity := normIntensity]
   }else{
     dt
   }

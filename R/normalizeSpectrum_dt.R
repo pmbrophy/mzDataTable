@@ -5,5 +5,5 @@
 #' @return returns mzDt with extra column `intensity_norm`
 #'
 .normalizeSpectrum_dt <- function(mzDt){
-  mzDt[, intensity_norm := intensity/max(intensity)]
+  mzDt[, list(intensity_norm = intensity/max(intensity))]
 }

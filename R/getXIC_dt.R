@@ -70,10 +70,7 @@ getXIC_dt <- function(mzDt, mz, mz_delta = NULL, ppmTol = NULL, iStart = NULL, i
     }
 
     mzDt[mz %between% c(mz_min, mz_max) & seqNum %between% c(iStart, iStop),
-         list(sumIntensity = sum(intensity),
-              mzMax = max(mz),
-              mzMin = min(mz),
-              numIons = .N),
+         list(sumIntensity = sum(intensity)),
          by = list(seqNum, retentionTime)]
 
   }else if(!is.null(tStart) | !is.null(tStop)){
@@ -89,10 +86,7 @@ getXIC_dt <- function(mzDt, mz, mz_delta = NULL, ppmTol = NULL, iStart = NULL, i
     }
 
     mzDt[mz %between% c(mz_min, mz_max) & retentionTime %between% c(tStart, tStop),
-         list(sumIntensity = sum(intensity),
-              mzMax = max(mz),
-              mzMin = min(mz),
-              numIons = .N),
+         list(sumIntensity = sum(intensity)),
          by = list(seqNum, retentionTime)]
 
   }else{
@@ -101,10 +95,7 @@ getXIC_dt <- function(mzDt, mz, mz_delta = NULL, ppmTol = NULL, iStart = NULL, i
     ####################################################################################### #
 
     mzDt[mz %between% c(mz_min, mz_max),
-         list(sumIntensity = sum(intensity),
-              mzMax = max(mz),
-              mzMin = min(mz),
-              numIons = .N),
+         list(intensity = sum(intensity)),
          by = list(seqNum, retentionTime)]
   }
 }
