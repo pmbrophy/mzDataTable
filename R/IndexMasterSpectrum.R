@@ -25,17 +25,19 @@ indexMasterSpectrum <- function(dt, ppmTol, isCentroid = TRUE){
     stop("dt does not contain a column named 'mz'")
   }
 
-  #Do the Gridding
+  #Do the Gridding: Both return at least:
+  # "mzGrid" - the m/z values of each grid and
+  # "mzGrid_index" - an index value for each grid.
   if(isCentroid){
     dt_grid <- .C_normCentroidMz(mz = dt$mz, ppmTol = ppmTol)
     dt_grid[, mz := NULL]
   }else{
     dt_grid <- .normProfileMz(mz = dt$mz)
-    dt_grid[, mz := NULL]
   }
 
   #Return result
-  cbind.data.frame(dt, dt_grid)
+  dt[, c("mzGrid", "mzGrid_index") := list(dt_grid$mzGrid, dt_grid$mzGrid_index)]
+  dt
 }
 
 #' Calculate global m/z grid for profile mode data
@@ -62,6 +64,7 @@ indexMasterSpectrum <- function(dt, ppmTol, isCentroid = TRUE){
 
   #reorder to orignal input
   data.table::setkey(x = mz, "index", physical = TRUE)
+  data.table::setnames(x = mz, old = c("mz"), new = c("mzGrid"))
 
   #Remove index
   index <- NULL
