@@ -2,6 +2,9 @@
 
 export(.check_mzDataTable)
 export(C_normCentroidMz)
+export(getBPI_dt)
+export(getSumSpectrum_dt)
+export(getTIC_dt)
 export(getXIC_dt)
 export(indexMasterSpectrum)
 export(mzML2csv)

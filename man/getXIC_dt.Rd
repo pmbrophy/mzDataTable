@@ -8,7 +8,7 @@ getXIC_dt(
   mzDt,
   mz,
   mz_delta = NULL,
-  massAccuracy = NULL,
+  ppmTol = NULL,
   iStart = NULL,
   iStop = NULL,
   tStart = NULL,
@@ -23,7 +23,7 @@ getXIC_dt(
 \item{mz_delta}{Optional. A numeric value +/- the mz value to extract.
 Default = NULL.}
 
-\item{massAccuracy}{Optional. The mass accuracy of the instrument in ppm.
+\item{ppmTol}{Optional. The mass accuracy of the instrument in ppm.
 Default = NULL}
 
 \item{iStart}{Optional. The integer start index to begin extracting ions.
@@ -47,12 +47,12 @@ Extract ions by mz using a variety of options for subsetting.
 }
 \details{
 mzDt and mz must be provided. Default behavior is to extract ions
-  exactly matching mz value provided accross all time.
+  exactly matching mz value accross all time.
 
-  Specifying mz_delta or massAccuracy will result in mz filtering. mz_delta
+  Specifying mz_delta or ppmTol will result in mz filtering. mz_delta
   will extract ions with values in the range where mz >= mz-mz_delta and mz
-  <= mz+mz_delta. Specifying massAccuracy workes similarly, but calculates
-  the upper and lower bounds from ppm error.
+  <= mz+mz_delta. Specifying ppmTol workes similarly, but calculates
+  the upper and lower bounds from ppm mass error.
 
   Specifying iStart/iStop or tStart/tStop will result in time filtering.
 }

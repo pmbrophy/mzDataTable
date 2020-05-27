@@ -11,7 +11,7 @@ indexMasterSpectrum(dt, ppmTol, isCentroid = TRUE)
 
 \item{ppmTol}{the grouping tolerance in ppm}
 
-\item{isCentroid}{logical, default is `TRUE`. Are the spectra centroids?}
+\item{isCentroid}{Logical. The default is `TRUE`. Are the spectra centroids?}
 }
 \value{
 Returns the original data.table also containing the the normalized
