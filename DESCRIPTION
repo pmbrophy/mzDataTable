@@ -21,5 +21,6 @@ LinkingTo:
     Rcpp
 Suggests: 
     knitr,
-    rmarkdown
+    rmarkdown,
+    msdata
 VignetteBuilder: knitr

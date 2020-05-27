@@ -27,16 +27,16 @@ The [mzDataTable](https://github.com/pmbrophy/mzDataTable) package aims to provi
 # Import and Conversion Functions
 ## The mzML2dataTable Function: get data into memory
 
-We can use the mock .mzML data provided in the [mzDataTable](https://github.com/pmbrophy/mzDataTable) package as an example. 
+We can use the mock .mzML data provided in the [mzDataTable](https://github.com/pmbrophy/mzDataTable) package as an example or get real data from [msdata](https://bioconductor.org/packages/msdata/). 
 ```{r setup}
 #load the library and data.table
 library(mzDataTable)
 library(data.table)
 
-dataPath <- system.file("extdata", "example.mzML", package="mzDataTable", mustWork = TRUE)
+dataPath <- msdata::proteomics(full.names = TRUE)[3]
 
 #Read the .mzML file into memory as a data.table
-dt <- mzML2dataTable(path = dataPath)
+dt <- mzML2dataTable(path = dataPath, scans = c(1:10))
 
 is.data.table(dt)
 
