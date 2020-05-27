@@ -28,8 +28,8 @@ getSumSpectrum_dt <- function(mzDt, ppmTol = NULL, iStart = NULL, iStop = NULL, 
   .check_mzDataTable(mzDt)
 
   #mz Grid Params
-  if(is.null(ppmTol)){
-    stop("Mass accuracy in ppm must be provided.")
+  if(is.null(ppmTol) & isCentroid){
+    stop("Mass accuracy in ppm must be provided for centered data.")
   }
 
   #Subset by time
