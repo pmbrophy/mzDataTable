@@ -5,7 +5,7 @@
 #'
 #' @param dt a data.table containing a column named mz
 #' @param ppmTol the grouping tolerance in ppm
-#' @param isCentroid logical, default is `TRUE`. Are the spectra centroids?
+#' @param isCentroid Logical. The default is `TRUE`. Are the spectra centroids?
 #'
 #' @return Returns the original data.table also containing the the normalized
 #'   m/z values and their index
@@ -25,14 +25,17 @@ indexMasterSpectrum <- function(dt, ppmTol, isCentroid = TRUE){
     stop("dt does not contain a column named 'mz'")
   }
 
+  #Do the Gridding
   if(isCentroid){
     dt_grid <- .C_normCentroidMz(mz = dt$mz, ppmTol = ppmTol)
-
+    dt_grid[, mz := NULL]
   }else{
     dt_grid <- .normProfileMz(mz = dt$mz)
+    dt_grid[, mz := NULL]
   }
+
   #Return result
-  data.table::data.table(dt, dt_grid)
+  cbind.data.frame(dt, dt_grid)
 }
 
 #' Calculate global m/z grid for profile mode data
