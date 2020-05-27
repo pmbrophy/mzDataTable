@@ -7,11 +7,11 @@
 #'
 #' @return returns a list containing `groups` and `groupIndex` both of which are
 #'   lists of length nGroups
-#' @export
 #'
 #' @examples
+#' \dontrun{
 #' index <- c(c(1:10), c(30:40))
-#' groupedIndex <- splitIndex(nGroups = 3, index = index, randomize = TRUE)
+#' groupedIndex <- .splitIndex(nGroups = 3, index = index, randomize = TRUE)
 #'
 #' groups <- unlist(groupedIndex$groups)
 #' groups_i <- unlist(groupedIndex$groupIndex)
@@ -21,9 +21,9 @@
 #' #Reorder the radomized groups by groups_i
 #' groups_reorder <- vector(mode = "numeric", length = length(groups))
 #' groups_reorder[groups_i] <- groups
-#' groups_reorder
+#' groups_reorder}
 #'
-splitIndex <- function(index, nGroups, randomize = FALSE){
+.splitIndex <- function(index, nGroups, randomize = FALSE){
   indexLength <- length(index)
 
   #randomized index_i for the vector index

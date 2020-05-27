@@ -16,7 +16,7 @@ converted}
 import size will be aproximately the size of chunkSize}
 }
 \value{
-a list object containing the group indices and order of those indicies. See splitIndex.
+a list object containing the group indices and order of those indicies. See .splitIndex.
 }
 \description{
 Break sets of ms scans into indexed chunks for multi-import methods

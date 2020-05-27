@@ -93,7 +93,7 @@
 #' @param chunkSize The number of scans to be processed at a time - actual
 #'   import size will be aproximately the size of chunkSize
 #'
-#' @return a list object containing the group indices and order of those indicies. See splitIndex.
+#' @return a list object containing the group indices and order of those indicies. See .splitIndex.
 #'
 #' @examples
 #' \dontrun{
@@ -115,7 +115,7 @@
     chunkSize <- nScans
   }
   nGroups <- ceiling(nScans/chunkSize)
-  scanChunks <- splitIndex(index = scans, nGroups = nGroups, randomize = FALSE)$groups
+  scanChunks <- .splitIndex(index = scans, nGroups = nGroups, randomize = FALSE)$groups
 
   scanChunks
 }
