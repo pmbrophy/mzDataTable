@@ -40,7 +40,7 @@
   seqNum <- NULL
 
   #Fill Missing Values
-  if(is.null(iStart & !is.null(iStop))){
+  if(is.null(iStart) & !is.null(iStop)){
     iStart <- min(mzObj[, seqNum])
 
   }else if(is.null(iStop) & !is.null(iStart)){
