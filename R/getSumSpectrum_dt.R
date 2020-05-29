@@ -3,7 +3,7 @@
 #' @description Sum multiple scans and optionally normalize the spectrum. Scans
 #'   are gridded by the grouping algorithm `indexMasterSpectrum()`.
 #'
-#' @param mzDt a data.table imported by `mzML2dataTable()`.
+#' @param mzObj a data.table imported by `mzML2dataTable()`.
 #' @param ppmTolOptional. The mass accuracy of the instrument in ppm. Default =
 #'   NULL
 #' @param iStart Optional. The integer start index to begin extracting ions.
@@ -23,52 +23,116 @@
 #' @examples
 #'
 
-getSumSpectrum_dt <- function(mzDt, ppmTol = NULL, iStart = NULL, iStop = NULL, tStart = NULL, tStop = NULL, normalize = FALSE, isCentroid = TRUE){
+getSumSpectrum <- function(mzObj, ppmTol = NULL, iStart = NULL, iStop = NULL, tStart = NULL, tStop = NULL, normalize = FALSE, isCentroid = TRUE){
   #Check data.table
-  .check_mzDataTable(mzDt)
+  isDataTable <- .check_mzDataTable(mzObj)
 
   #mz Grid Params
   if(is.null(ppmTol) & isCentroid){
     stop("Mass accuracy in ppm must be provided for centered data.")
   }
 
+  iRange <<- c(iStart, iStop)
+  tRange <<- c(tStart, tStop)
+
   #Subset by time
-  if((!is.null(iStart) | !is.null(iStop)) & (!is.null(tStart) | !is.null(tStop))){
-    stop("iStart/iStop and tStart/tStop cannot both be specified")
-  }else if(!is.null(iStart) | !is.null(iStop)){
-    ####################################################################################### #
-    ###########################       TIME FILTER BY SeqNum           ##################### #
-    ####################################################################################### #
-
-    #Fill Missing Values
-    if(is.null(iStart)){
-      iStart <- min(mzDt$seqNum)
-    }else if(is.null(iStop)){
-      iStop <- max(mzDt$seqNum)
-    }
-
-    mzDt <- mzDt[seqNum %between% c(iStart, iStop),]
-
-  }else if(!is.null(tStart) | !is.null(tStop)){
-    ####################################################################################### #
-    #######################       TIME FILTER BY retentionTime           ################## #
-    ####################################################################################### #
-
-    #Fill Missing Values
-    if(is.null(tStart)){
-      tStart <- min(mzDt$retentionTime)
-    }else if(is.null(tStop)){
-      tStop <- max(mzDt$retentionTime)
-    }
-
-    mzDt <- mzDt[retentionTime %between% c(tStart, tStop),]
-
+  if(isDataTable){
+    sumSpec <- .getSumSpectrum_dt(mzDt = mzObj, iRange = iRange, tRange = tRange)
+  }else{
+    sumSpec <- .getSumSpectrum_dskF(mzDskF = mzObj, iRange = iRange, tRange = tRange)
   }
 
+  remove(tRange, envir = .GlobalEnv)
+  remove(iRange, envir = .GlobalEnv)
+
   #Grid
-  mzDt <- indexMasterSpectrum(dt = mzDt, ppmTol = ppmTol, isCentroid = isCentroid)
+  sumSpec <- indexMasterSpectrum(mzDt = sumSpec, ppmTol = ppmTol, isCentroid = isCentroid)
 
   #Sum each grid
-  mzDt <- mzDt[, list(intensity = sum(intensity)), by = list(mzGrid_index, mzGrid)]
-  mzDt
+  sumSpec <- sumSpec[, list(intensity = sum(intensity)), by = list(mzGrid_index, mzGrid)]
+
+  #Normalize
+  if(normalize){
+    normIntensity <- .normalizeSpectrum_dt(mzDt = sumSpec)
+    sumSpec[, intensity := NULL]
+    sumSpec[, intensity := normIntensity]
+  }
+
+  data.table::setkey(x = sumSpec, physical = TRUE, "mzGrid_index")
+}
+
+
+#' Pre-process mzDskF for sum spectrum
+#'
+#' @details Extract mz and intensity from a disk.frame and optionally filter by
+#'   time. Return only mz and intensity as a data.table.
+#'
+#' @param mzRange m/z range returned by .getMzRange().
+#' @param iRange seqNum range returned by .getiRange().
+#' @param tRange retentionTime range returned by .gettRange().
+#'
+#' @return Return only mz and intensity as a data.table.
+#'
+
+.getSumSpectrum_dskF <- function(mzDskF, iRange, tRange){
+
+  tRangeIsValid <- !is.null(tRange) & .inGlobalEnv(varNames = "tRange")
+  iRangeIsValid <- !is.null(iRange) & .inGlobalEnv(varNames = "iRange")
+
+  if(tRangeIsValid){
+    #Filter time by retentionTime
+    sumSpec <- mzDskF[retentionTime %between% tRange,
+                      keep = c("mz", "retentionTime", "intensity")]
+    sumSpec[, retentionTime := NULL]
+
+  }else if(iRangeIsValid){
+    #Filter time by seqNum
+    sumSpec <- mzDskF[seqNum %between% iRange,
+                      keep = c("mz", "seqNum", "intensity")]
+    sumSpec[, seqNum := NULL]
+
+  }else if(iRangeIsValid & tRangeIsValid){
+    stop("iStart/iStop and tStart/tStop cannot both be specified")
+
+  }else{
+    #Do not filter time
+    sumSpec <- mzDskF[keep = c("mz", "intensity")]
+
+  }
+  sumSpec
+}
+
+#' Pre-process mzDt for sum spectrum
+#'
+#' @details Extract mz and intensity from a data.table and optionally filter by
+#'   time. Return only mz and intensity as a data.table.
+#'
+#' @param mzRange m/z range returned by .getMzRange().
+#' @param iRange seqNum range returned by .getiRange().
+#' @param tRange retentionTime range returned by .gettRange().
+#'
+#' @return Return only mz and intensity as a data.table.
+#'
+
+.getSumSpectrum_dt <- function(mzDt, iRange, tRange){
+  tRangeIsValid <- !is.null(tRange) & .inGlobalEnv(varNames = "tRange")
+  iRangeIsValid <- !is.null(iRange) & .inGlobalEnv(varNames = "iRange")
+
+  if(tRangeIsValid){
+    #Filter time by retentionTime
+    sumSpec <- mzDt[retentionTime %between% tRange, list(mz, intensity)]
+
+  }else if(iRangeIsValid){
+    #Filter time by seqNum
+    sumSpec <- mzDt[seqNum %between% iRange, list(mz, intensity)]
+
+  }else if(iRangeIsValid & tRangeIsValid){
+    stop("iStart/iStop and tStart/tStop cannot both be specified")
+
+  }else{
+    #Do not filter time
+    sumSpec <- mzDt[,list(mz, intensity)]
+
+  }
+  sumSpec
 }
