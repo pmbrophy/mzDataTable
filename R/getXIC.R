@@ -72,6 +72,11 @@ getXIC <- function(mzObj, mz, mz_delta = NULL, ppmTol = NULL, iStart = NULL, iSt
 #'
 
 .getXIC_dskF <- function(mzDskF, mzRange, iRange, tRange){
+  intensity <- NULL
+  mz <- NULL
+  seqNum <- NULL
+  retentionTime <- NULL
+
   tRangeIsValid <- !is.null(tRange) & .inGlobalEnv(varNames = "tRange")
   iRangeIsValid <- !is.null(iRange) & .inGlobalEnv(varNames = "iRange")
 
@@ -117,6 +122,11 @@ getXIC <- function(mzObj, mz, mz_delta = NULL, ppmTol = NULL, iStart = NULL, iSt
 #'
 
 .getXIC_dt <- function(mzDt, mzRange, iRange, tRange){
+  intensity <- NULL
+  mz <- NULL
+  seqNum <- NULL
+  retentionTime <- NULL
+
   tRangeIsValid <- !is.null(tRange) & .inGlobalEnv(varNames = "tRange")
   iRangeIsValid <- !is.null(iRange) & .inGlobalEnv(varNames = "iRange")
 

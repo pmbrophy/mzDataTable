@@ -4,10 +4,10 @@
 \alias{indexMasterSpectrum}
 \title{Index the m/z axis}
 \usage{
-indexMasterSpectrum(dt, ppmTol, isCentroid = TRUE)
+indexMasterSpectrum(mzDt, ppmTol, isCentroid = TRUE)
 }
 \arguments{
-\item{dt}{a data.table containing a column named mz}
+\item{mzDt}{a data.table containing a column named mz}
 
 \item{ppmTol}{the grouping tolerance in ppm}
 

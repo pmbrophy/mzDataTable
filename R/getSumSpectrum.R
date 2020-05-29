@@ -3,8 +3,8 @@
 #' @description Sum multiple scans and optionally normalize the spectrum. Scans
 #'   are gridded by the grouping algorithm `indexMasterSpectrum()`.
 #'
-#' @param mzObj a data.table imported by `mzML2dataTable()`.
-#' @param ppmTolOptional. The mass accuracy of the instrument in ppm. Default =
+#' @param mzObj a data.table or disk.frame imported from mzML/mzXML file.
+#' @param ppmTol The mass accuracy of the instrument in ppm. Default =
 #'   NULL
 #' @param iStart Optional. The integer start index to begin extracting ions.
 #'   Default = NULL.
@@ -24,6 +24,11 @@
 #'
 
 getSumSpectrum <- function(mzObj, ppmTol = NULL, iStart = NULL, iStop = NULL, tStart = NULL, tStop = NULL, normalize = FALSE, isCentroid = TRUE){
+  suppressWarnings(remove(iRange, tRange, envir = .GlobalEnv))
+  intensity <- NULL
+  mzGrid <- NULL
+  mzGrid_index <- NULL
+
   #Check data.table
   isDataTable <- .check_mzDataTable(mzObj)
 
@@ -67,7 +72,7 @@ getSumSpectrum <- function(mzObj, ppmTol = NULL, iStart = NULL, iStop = NULL, tS
 #' @details Extract mz and intensity from a disk.frame and optionally filter by
 #'   time. Return only mz and intensity as a data.table.
 #'
-#' @param mzRange m/z range returned by .getMzRange().
+#' @param mzDskF A disk.frame validated by .check_mzDataTable()
 #' @param iRange seqNum range returned by .getiRange().
 #' @param tRange retentionTime range returned by .gettRange().
 #'
@@ -75,6 +80,8 @@ getSumSpectrum <- function(mzObj, ppmTol = NULL, iStart = NULL, iStop = NULL, tS
 #'
 
 .getSumSpectrum_dskF <- function(mzDskF, iRange, tRange){
+  retentionTime <- NULL
+  seqNum <- NULL
 
   tRangeIsValid <- !is.null(tRange) & .inGlobalEnv(varNames = "tRange")
   iRangeIsValid <- !is.null(iRange) & .inGlobalEnv(varNames = "iRange")
@@ -107,7 +114,7 @@ getSumSpectrum <- function(mzObj, ppmTol = NULL, iStart = NULL, iStop = NULL, tS
 #' @details Extract mz and intensity from a data.table and optionally filter by
 #'   time. Return only mz and intensity as a data.table.
 #'
-#' @param mzRange m/z range returned by .getMzRange().
+#' @param mzDt a data.table validated by .check_mzDataTable()
 #' @param iRange seqNum range returned by .getiRange().
 #' @param tRange retentionTime range returned by .gettRange().
 #'
@@ -115,6 +122,11 @@ getSumSpectrum <- function(mzObj, ppmTol = NULL, iStart = NULL, iStop = NULL, tS
 #'
 
 .getSumSpectrum_dt <- function(mzDt, iRange, tRange){
+  intensity <- NULL
+  mz <- NULL
+  seqNum <- NULL
+  retentionTime <- NULL
+
   tRangeIsValid <- !is.null(tRange) & .inGlobalEnv(varNames = "tRange")
   iRangeIsValid <- !is.null(iRange) & .inGlobalEnv(varNames = "iRange")
 

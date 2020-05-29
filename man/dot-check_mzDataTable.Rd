@@ -2,18 +2,18 @@
 % Please edit documentation in R/check_mzDataTable.R
 \name{.check_mzDataTable}
 \alias{.check_mzDataTable}
-\title{Check mzDt for data structure}
+\title{Check mzObj for data structure}
 \usage{
-.check_mzDataTable(mzDt)
+.check_mzDataTable(mzObj)
 }
 \arguments{
-\item{mzDt}{a data.table or a disk.frame}
+\item{mzObj}{a data.table or disk.frame imported from mzML/mzXML file.}
 }
 \value{
 return `TRUE` for data.table and `FALSE` for disk.frame.
 }
 \description{
-Check mzDt for data structure
+Check mzObj for data structure
 }
 \details{
 Function is intended to check for expected column types in mzObj

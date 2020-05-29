@@ -9,11 +9,13 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
+```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+#load the library and data.table
+library(mzDataTable)
 ```
 
 # Introduction
@@ -25,20 +27,143 @@ The [mzDataTable](https://github.com/pmbrophy/mzDataTable) package aims to provi
 3. `mzML2diskFrame` converts an .mzML/.mzXML file to a `disk.frame` directory by first reading chunks of the .mzML/.mzXML file into memory as `data.table`s and sequentially writing them as `disk.frame` chunks. This provides efficent on-disk manipulation of raw mass spectrometry data.
 
 # Import and Conversion Functions
-## The mzML2dataTable Function: get data into memory
+## The `mzML2dataTable` Function: get data into memory
 
 We can use the mock .mzML data provided in the [mzDataTable](https://github.com/pmbrophy/mzDataTable) package as an example or get real data from [msdata](https://bioconductor.org/packages/msdata/). 
-```{r setup}
-#load the library and data.table
-library(mzDataTable)
-library(data.table)
-
+```{r}
 dataPath <- msdata::proteomics(full.names = TRUE)[3]
 
 #Read the .mzML file into memory as a data.table
-dt <- mzML2dataTable(path = dataPath, scans = c(1:10))
+dt <- mzML2dataTable(path = dataPath)
 
-is.data.table(dt)
+data.table::is.data.table(dt)
 
 head(dt)
+```
+
+## The `mzML2diskFrame` Function: get serialized data onto hard disk for on-disk manipulations
+```{r}
+dskF_path <- paste0(getwd(), "/", basename(dataPath),".df")
+
+#Create disk frame
+#dskF <- mzML2diskFrame(path = dataPath, diskFramePath = dskF_path)
+
+#Connect to disk frame
+dskF <- disk.frame::disk.frame(path = dskF_path)
+disk.frame::setup_disk.frame()
+options(future.globals.maxSize = Inf)
+```
+
+# Data Manipulation Functions
+
+Once data are imported into R, there are some functions provided for basic manipulations:
+
+1. `getTIC` calculates the total ion chromatogram
+2. `getBPI` calculates the base peak intensity chromatogram
+3. `getXIC` extracts summed ion signal intensity over a specified mass range 
+4. `getSumSpectrum_dt` produces a summed (and optionally normalized) mass spectrum
+
+## `getTIC` example: plot total ion chromatogram from MS level == 1, 2, and 3 individually
+```{r}
+tic_dt <- getTIC(mzObj = dt[msLevel == 1], normalize = FALSE)
+tic_df <- getTIC(mzObj = dskF[msLevel == 1], normalize = FALSE)
+
+identical(tic_dt, tic_df)
+
+tic_dt <- getTIC(mzObj = dt[msLevel == 1], normalize = TRUE)
+tic_df <- getTIC(mzObj = dskF[msLevel == 1], normalize = TRUE)
+
+identical(tic_dt, tic_df)
+
+tic_dt <- getTIC(mzObj = dt, normalize = TRUE)
+tic_df <- getTIC(mzObj = dskF, normalize = TRUE)
+
+identical(tic_dt, tic_df)
+
+plot(x = tic_dt$retentionTime, y = tic_dt$intensity, type = "l")
+```
+
+## `getBPI` example: get base peak intensity
+```{r}
+bpi_dt <- getBPI(mzObj = dt[msLevel == 1], normalize = FALSE)
+bpi_df <- getBPI(mzObj = dskF[msLevel == 1], normalize = FALSE)
+
+identical(bpi_dt, bpi_df)
+
+bpi_dt <- getBPI(mzObj = dt[msLevel == 1], normalize = TRUE)
+bpi_df <- getBPI(mzObj = dskF[msLevel == 1], normalize = TRUE)
+
+identical(bpi_dt, bpi_df)
+
+remove(bpi_dt, bpi_df)
+bpi_dt <- getBPI(mzObj = dt, normalize = TRUE)
+bpi_df <- getBPI(mzObj = dskF, normalize = TRUE)
+
+identical(bpi_dt, bpi_df)
+
+plot(x = bpi_dt$retentionTime, y = bpi_dt$intensity, type = "l")
+```
+
+## `getXIC` example: extract m/z 376.2756 +/- 25 ppm
+```{r}
+
+xic_dt <- getXIC(mzObj = dt[msLevel == 1], mz = 376.2756, ppmTol = 25, iStart = 1)
+
+xic_dt <- getXIC(mzObj = dt[msLevel == 1], mz = 376.2756, ppmTol = 25)
+xic_df <- getXIC(mzObj = dskF[msLevel == 1], mz = 376.2756, ppmTol = 25)
+
+identical(xic_dt, xic_df)
+
+xic_dt <- getXIC(mzObj = dt, mz = 376.2756, ppmTol = 25)
+xic_df <- getXIC(mzObj = dskF, mz = 376.2756, ppmTol = 25)
+
+identical(xic_dt, xic_df)
+
+xic_dt <- getXIC(mzObj = dt, mz = 376.2756, ppmTol = 25, iStart = 10, iStop = 12)
+xic_df <- getXIC(mzObj = dskF, mz = 376.2756, ppmTol = 25, iStart = 10, iStop = 12)
+
+identical(xic_dt, xic_df)
+
+xic_dt <- getXIC(mzObj = dt, mz = 376.2756, ppmTol = 25, tStart = 2730, tStop = 2750)
+xic_df <- getXIC(mzObj = dskF, mz = 376.2756, ppmTol = 25, tStart = 2730, tStop = 2750)
+
+identical(xic_dt, xic_df)
+
+plot(x = xic_dt$retentionTime, y = xic_dt$intensity, type = "l")
+```
+
+## `getSumSpectrum_dt` example: sum MS1 spectra
+```{r}
+spec_norm <- getSumSpectrum(mzObj = dt[msLevel == 1], normalize = TRUE, isCentroid = FALSE)
+spec <- getSumSpectrum(mzObj = dt[msLevel == 1], normalize = FALSE, isCentroid = FALSE)
+
+spec_dt <- getSumSpectrum(mzObj = dt, normalize = FALSE, isCentroid = TRUE, ppmTol = 100)
+spec_dskF <- getSumSpectrum(mzObj = dskF, normalize = FALSE, isCentroid = TRUE, ppmTol = 100)
+identical(spec_dt, spec_dskF)
+
+spec_dt <- getSumSpectrum(mzObj = dt, normalize = FALSE, isCentroid = TRUE, ppmTol = 100, iStart = 10, iStop = 20)
+spec_dskF <- getSumSpectrum(mzObj = dskF, normalize = FALSE, isCentroid = TRUE, ppmTol = 100,  iStart = 10, iStop = 20)
+
+
+spec <- getSumSpectrum(mzObj = dt, normalize = FALSE, isCentroid = TRUE, ppmTol = 100, tStart = 10, tStop = 20)
+spec <- getSumSpectrum(mzObj = dskF, normalize = FALSE, isCentroid = TRUE, ppmTol = 100,  tStart = 10, tStop = 20)
+
+plot(x = spec_dskF$mzGrid, y = spec_dskF$intensity, type = "h")
+```
+
+###UNDERSTAND disk.frame OPERATION ORDER
+```{r eval=FALSE, include=FALSE}
+#What happens? 1) read mz, seqNum, intensity from disk as data.table. 2) apply %between%
+dskF_test <- dskF[seqNum %between% c(1,2), keep = c("mz", "seqNum", "intensity")]
+
+#Is it the same as this?
+dskF_test <- dskF[keep = c("mz", "seqNum", "intensity")]
+
+dskF_test <- dskF_test[seqNum %between% c(1,2)]
+
+#What happens with 1 vs 6 workers? 
+#1) each worker reads in mz, seqNum, intensity
+#2) each worker then subsets by %between%?
+
+#So, in the case of a single worker... read in columns, subset, return subset to Global Env, and repeat?
 ```

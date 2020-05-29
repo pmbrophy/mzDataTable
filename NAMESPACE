@@ -3,7 +3,7 @@
 export(.check_mzDataTable)
 export(C_normCentroidMz)
 export(getBPI)
-export(getSumSpectrum_dt)
+export(getSumSpectrum)
 export(getTIC)
 export(getXIC)
 export(indexMasterSpectrum)

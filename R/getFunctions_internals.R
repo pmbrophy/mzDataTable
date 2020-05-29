@@ -37,6 +37,8 @@
 #'
 
 .getiRange <- function(mzObj, iStart, iStop){
+  seqNum <- NULL
+
   #Fill Missing Values
   if(is.null(iStart & !is.null(iStop))){
     iStart <- min(mzObj[, seqNum])
@@ -58,6 +60,8 @@
 #'
 
 .gettRange <- function(mzObj, tStart, tStop){
+  retentionTime <- NULL
+
   #Fill Missing Values
   if(is.null(tStart) & !is.null(tStop)){
     tStart <- min(mzObj[, retentionTime])

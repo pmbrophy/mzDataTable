@@ -17,3 +17,6 @@ getTIC(mzObj, normalize = FALSE)
 \description{
 Calculate total ion chromatogram
 }
+\examples{
+
+}

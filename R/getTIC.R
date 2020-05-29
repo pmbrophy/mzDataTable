@@ -7,7 +7,11 @@
 #' @export
 #'
 #' @examples
+#'
+
 getTIC <- function(mzObj, normalize = FALSE){
+  intensity <- NULL
+
   #Check data.table
   isDataTable <- .check_mzDataTable(mzObj)
 
@@ -28,7 +32,7 @@ getTIC <- function(mzObj, normalize = FALSE){
   }
 
   #Sort
-  setkey(x = TIC, physical = TRUE, "seqNum")
+  data.table::setkey(x = TIC, physical = TRUE, "seqNum")
 
   TIC
 }
@@ -43,6 +47,10 @@ getTIC <- function(mzObj, normalize = FALSE){
 #'
 
 .getTIC_dskF <- function(mzDskF){
+  intensity <- NULL
+  seqNum <- NULL
+  retentionTime <- NULL
+
   #Sum intensity
   TIC <- mzDskF[, list(intensity = sum(intensity)),
                 by = list(seqNum, retentionTime),
@@ -61,6 +69,10 @@ getTIC <- function(mzObj, normalize = FALSE){
 #'
 
 .getTIC_dt <- function(mzDt){
+  intensity <- NULL
+  seqNum <- NULL
+  retentionTime <- NULL
+
   #Sum intensity
   TIC <- mzDt[, list(intensity = sum(intensity)),
               by = list(seqNum, retentionTime)]

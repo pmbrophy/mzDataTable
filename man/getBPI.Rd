@@ -7,9 +7,9 @@
 getBPI(mzObj, normalize = FALSE)
 }
 \arguments{
-\item{normalize}{Logical. Default = FALSE. Should the data be normalized?}
+\item{mzObj}{a data.table or disk.frame imported from mzML/mzXML file.}
 
-\item{mzDt}{a data.table imported by mzML2dataTable().}
+\item{normalize}{Logical. Default = FALSE. Should the data be normalized?}
 }
 \value{
 Returns a data.table

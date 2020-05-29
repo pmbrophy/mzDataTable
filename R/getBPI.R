@@ -1,6 +1,6 @@
 #' Get Base Peak Intensity
 #'
-#' @param mzDt a data.table imported by mzML2dataTable().
+#' @param mzObj a data.table or disk.frame imported from mzML/mzXML file.
 #' @param normalize Logical. Default = FALSE. Should the data be normalized?
 #'
 #' @return Returns a data.table
@@ -10,6 +10,8 @@
 #'
 
 getBPI <- function(mzObj, normalize = FALSE){
+  intensity <- NULL
+
   #Check mzObj
   isDataTable <- .check_mzDataTable(mzObj)
 
@@ -27,7 +29,7 @@ getBPI <- function(mzObj, normalize = FALSE){
     BPI[, intensity := normIntensity]
   }
 
-  setkey(x = BPI, physical = TRUE, "seqNum")
+  data.table::setkey(x = BPI, physical = TRUE, "seqNum")
 
   BPI
 }
@@ -43,6 +45,11 @@ getBPI <- function(mzObj, normalize = FALSE){
 #'
 
 .getBPI_dskF <- function(mzDskF){
+  intensity <- NULL
+  mz <- NULL
+  seqNum <- NULL
+  retentionTime <- NULL
+
   BPI <- mzDskF[, list(intensity = max(intensity), basePeak_mz = mz[which.max(intensity)]),
                 by = list(seqNum, retentionTime),
                 keep = c("intensity", "mz", "seqNum", "retentionTime")]
@@ -61,6 +68,11 @@ getBPI <- function(mzObj, normalize = FALSE){
 #'
 
 .getBPI_dt <- function(mzDt){
+  intensity <- NULL
+  mz <- NULL
+  seqNum <- NULL
+  retentionTime <- NULL
+
   BPI <- mzDt[, list(intensity = max(intensity), basePeak_mz = mz[which.max(intensity)]),
               by = list(seqNum, retentionTime)]
 

@@ -16,6 +16,8 @@
 #'
 
 indexMasterSpectrum <- function(mzDt, ppmTol, isCentroid = TRUE){
+  mz <- NULL
+
   #Input checks
   notDataTable <- !data.table::is.data.table(mzDt)
   mzColMissing <- !("mz" %in% colnames(mzDt))

@@ -1,31 +1,31 @@
-#' Check mzDt for data structure
+#' Check mzObj for data structure
 #'
 #' @details Function is intended to check for expected column types in mzObj
 #'   passed to various processing functions. It will return `TRUE` for
 #'   data.table and `FALSE` for disk.frame and throw an error if either are not
 #'   properly formatted.
 #'
-#' @param mzDt a data.table or a disk.frame
+#' @param mzObj a data.table or disk.frame imported from mzML/mzXML file.
 #'
 #' @return return `TRUE` for data.table and `FALSE` for disk.frame.
 #' @export
 #'
 
-.check_mzDataTable <- function(mzDt){
+.check_mzDataTable <- function(mzObj){
   msg <- "\n"
   err <- FALSE
-  isDiskFrame <- disk.frame::is_disk.frame(mzDt)
-  isDataTable <- data.table::is.data.table(mzDt)
-  #Make sure mzDt is a data.table or disk.frame
+  isDiskFrame <- disk.frame::is_disk.frame(mzObj)
+  isDataTable <- data.table::is.data.table(mzObj)
+  #Make sure mzObj is a data.table or disk.frame
   if(!isDiskFrame & !isDataTable){
-    msg <- paste(msg, "mzDt is not a data.table. \n")
+    msg <- paste(msg, "mzObj is not a data.table. \n")
     err <- TRUE
   }else if(isDataTable){
-    colNames <- base::colnames(mzDt)
-    rows <- base::nrow(mzDt)
+    colNames <- base::colnames(mzObj)
+    rows <- base::nrow(mzObj)
   }else if(isDiskFrame){
-    colNames <- disk.frame::colnames(mzDt)
-    rows <- disk.frame::nrow(mzDt)
+    colNames <- disk.frame::colnames(mzObj)
+    rows <- disk.frame::nrow(mzObj)
   }
 
   #Check Column Names
@@ -41,7 +41,7 @@
 
   #Make sure there are data
   if(rows == 0){
-    msg <- paste(msg, "mzDt contains no data. \n")
+    msg <- paste(msg, "mzObj contains no data. \n")
     err <- TRUE
   }
 
