@@ -1,8 +1,13 @@
 #' Check mzDt for data structure
 #'
+#' @details Function is intended to check for expected column types in mzObj
+#'   passed to various processing functions. It will return `TRUE` for
+#'   data.table and `FALSE` for disk.frame and throw an error if either are not
+#'   properly formatted.
+#'
 #' @param mzDt a data.table or a disk.frame
 #'
-#' @return return `TRUE` for data.table and `FALSE` for disk.frame
+#' @return return `TRUE` for data.table and `FALSE` for disk.frame.
 #' @export
 #'
 
