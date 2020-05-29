@@ -16,5 +16,5 @@ returns a data.table.
 Calculate total ion chromatogram from disk.frame
 }
 \details{
-Internal function used by getTIC to calculate TIC from disk.frame.
+Internal function used by getTIC to calculate BPI from disk.frame.
 }

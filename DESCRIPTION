@@ -12,7 +12,6 @@ biocViews:
 Imports: 
     disk.frame,
     Rfast,
-    testthat,
     Rcpp,
     mzR,
     data.table
@@ -22,5 +21,6 @@ LinkingTo:
 Suggests: 
     knitr,
     rmarkdown,
-    msdata
+    msdata,
+    testthat
 VignetteBuilder: knitr

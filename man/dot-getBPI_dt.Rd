@@ -16,5 +16,5 @@ returns a data.table.
 Calculate total ion chromatogram from data.table
 }
 \details{
-Internal function used by getTIC to calculate TIC from data.table.
+Internal function used by getTIC to calculate BPI from data.table.
 }

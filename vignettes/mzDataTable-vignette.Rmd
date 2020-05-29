@@ -46,10 +46,10 @@ head(dt)
 dskF_path <- paste0(getwd(), "/", basename(dataPath),".df")
 
 #Create disk frame
-#dskF <- mzML2diskFrame(path = dataPath, diskFramePath = dskF_path)
+dskF <- mzML2diskFrame(path = dataPath, diskFramePath = dskF_path)
 
 #Connect to disk frame
-dskF <- disk.frame::disk.frame(path = dskF_path)
+#dskF <- disk.frame::disk.frame(path = dskF_path)
 disk.frame::setup_disk.frame()
 options(future.globals.maxSize = Inf)
 ```
@@ -149,6 +149,10 @@ spec <- getSumSpectrum(mzObj = dt, normalize = FALSE, isCentroid = TRUE, ppmTol 
 spec <- getSumSpectrum(mzObj = dskF, normalize = FALSE, isCentroid = TRUE, ppmTol = 100,  tStart = 10, tStop = 20)
 
 plot(x = spec_dskF$mzGrid, y = spec_dskF$intensity, type = "h")
+```
+
+```{r}
+disk.frame::delete(df = dskF)
 ```
 
 ###UNDERSTAND disk.frame OPERATION ORDER
