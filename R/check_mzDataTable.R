@@ -8,7 +8,6 @@
 #' @param mzObj a data.table or disk.frame imported from mzML/mzXML file.
 #'
 #' @return return `TRUE` for data.table and `FALSE` for disk.frame.
-#' @export
 #'
 
 .check_mzDataTable <- function(mzObj){
