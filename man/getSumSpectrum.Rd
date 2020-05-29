@@ -12,6 +12,7 @@ getSumSpectrum(
   tStart = NULL,
   tStop = NULL,
   normalize = FALSE,
+  method,
   isCentroid = TRUE
 )
 }
@@ -34,6 +35,8 @@ Default = NULL.}
 Default = NULL.}
 
 \item{normalize}{Logical. Default = `FALSE`. Should the data be normalized?}
+
+\item{method}{the normalization method. "maxPeak", "sum", or "sqrt".}
 
 \item{isCentroid}{Logical. The default is `TRUE`. Are the spectra centroids?}
 }

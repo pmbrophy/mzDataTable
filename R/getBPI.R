@@ -2,6 +2,7 @@
 #'
 #' @param mzObj a data.table or disk.frame imported from mzML/mzXML file.
 #' @param normalize Logical. Default = FALSE. Should the data be normalized?
+#' @param method the normalization method. "maxPeak", "sum", or "sqrt".
 #'
 #' @return Returns a data.table
 #' @export
@@ -9,7 +10,7 @@
 #' @examples
 #'
 
-getBPI <- function(mzObj, normalize = FALSE){
+getBPI <- function(mzObj, normalize = FALSE, method = "sqrt"){
   intensity <- NULL
 
   #Check mzObj
@@ -23,7 +24,7 @@ getBPI <- function(mzObj, normalize = FALSE){
   }
 
   if(normalize){
-    normIntensity <- .normalizeSpectrum_dt(BPI)
+    normIntensity <- .normalizeSpectrum_dt(mzDt = BPI, method)
     #Replace summed intensity with normalized summed intensity
     BPI[, intensity := NULL]
     BPI[, intensity := normIntensity]

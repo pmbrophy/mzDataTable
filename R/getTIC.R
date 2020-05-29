@@ -2,6 +2,7 @@
 #'
 #' @param mzObj a data.table or disk.frame imported from mzML/mzXML file.
 #' @param normalize Logical. Default = FALSE. Should the data be normalized?
+#' @param method "maxPeak", "sum", or "sqrt"
 #'
 #' @return
 #' @export
@@ -9,7 +10,7 @@
 #' @examples
 #'
 
-getTIC <- function(mzObj, normalize = FALSE){
+getTIC <- function(mzObj, normalize = FALSE, method = "sqrt"){
   intensity <- NULL
 
   #Check data.table
@@ -25,7 +26,7 @@ getTIC <- function(mzObj, normalize = FALSE){
 
   #Option to normalize
   if(normalize){
-    normIntensity <- .normalizeSpectrum_dt(TIC)
+    normIntensity <- .normalizeSpectrum_dt(mzDt = TIC, method)
     #Replace summed intensity with normalized summed intensity
     TIC[, intensity := NULL]
     TIC[, intensity := normIntensity]

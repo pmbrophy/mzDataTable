@@ -17,6 +17,9 @@
 #'   Default = NULL.
 #' @param tStop Optional. The numeric time value to stop extracting ions.
 #'   Default = NULL.
+#' @param normalize Logical. Default = FALSE. Should the data be normalized?
+#' @param method the normalization method. "maxPeak", "sum", or "sqrt".
+#' 
 #'
 #' @details mzObj and mz must be provided. Default behavior is to extract ions
 #'   exactly matching mz value accross all time.
@@ -34,7 +37,7 @@
 #' @examples
 #'
 
-getXIC <- function(mzObj, mz, mz_delta = NULL, ppmTol = NULL, iStart = NULL, iStop = NULL, tStart = NULL, tStop = NULL){
+getXIC <- function(mzObj, mz, mz_delta = NULL, ppmTol = NULL, iStart = NULL, iStop = NULL, tStart = NULL, tStop = NULL, normalize = FALSE, method = "sqrt"){
   suppressWarnings(remove(mzRange, iRange, tRange, envir = .GlobalEnv))
 
   #Check data.table
@@ -55,7 +58,15 @@ getXIC <- function(mzObj, mz, mz_delta = NULL, ppmTol = NULL, iStart = NULL, iSt
   }else{
     xic <- .getXIC_dskF(mzDskF = mzObj, mzRange, iRange, tRange)
   }
-
+  
+  #Intensity normalization
+  if(normalize){
+    normIntensity <- .normalizeSpectrum_dt(mzDt = BPI)
+    #Replace summed intensity with normalized summed intensity
+    BPI[, intensity := NULL]
+    BPI[, intensity := normIntensity]
+  }
+  
   #Cleanup
   remove(mzRange, iRange, tRange, envir = .GlobalEnv)
   data.table::setkey(x = xic, physical = TRUE, "seqNum")

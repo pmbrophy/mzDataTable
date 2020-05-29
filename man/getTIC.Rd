@@ -4,12 +4,14 @@
 \alias{getTIC}
 \title{Calculate total ion chromatogram}
 \usage{
-getTIC(mzObj, normalize = FALSE)
+getTIC(mzObj, normalize = FALSE, method = "sqrt")
 }
 \arguments{
 \item{mzObj}{a data.table or disk.frame imported from mzML/mzXML file.}
 
 \item{normalize}{Logical. Default = FALSE. Should the data be normalized?}
+
+\item{method}{"maxPeak", "sum", or "sqrt"}
 }
 \value{
 

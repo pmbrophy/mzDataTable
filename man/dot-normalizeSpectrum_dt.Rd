@@ -4,14 +4,16 @@
 \alias{.normalizeSpectrum_dt}
 \title{Normalize a mzDt}
 \usage{
-.normalizeSpectrum_dt(mzDt)
+.normalizeSpectrum_dt(mzDt, method)
 }
 \arguments{
 \item{mzDt}{the mzDt to be normalized in place}
+
+\item{method}{"maxPeak", "sum", or "sqrt"}
 }
 \value{
 returns mzDt with extra column `intensity_norm`
 }
 \description{
-Normalize a mzDt
+Normalize a mzDt by one of the available methods.
 }

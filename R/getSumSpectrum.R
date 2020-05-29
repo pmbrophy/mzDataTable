@@ -15,6 +15,7 @@
 #' @param tStop Optional. The numeric time value to stop extracting ions.
 #'   Default = NULL.
 #' @param normalize Logical. Default = `FALSE`. Should the data be normalized?
+#' @param method the normalization method. "maxPeak", "sum", or "sqrt".
 #' @param isCentroid Logical. The default is `TRUE`. Are the spectra centroids?
 #'
 #' @return Returns a data.table
@@ -23,7 +24,7 @@
 #' @examples
 #'
 
-getSumSpectrum <- function(mzObj, ppmTol = NULL, iStart = NULL, iStop = NULL, tStart = NULL, tStop = NULL, normalize = FALSE, isCentroid = TRUE){
+getSumSpectrum <- function(mzObj, ppmTol = NULL, iStart = NULL, iStop = NULL, tStart = NULL, tStop = NULL, normalize = FALSE, method = "sqrt", isCentroid = TRUE){
   suppressWarnings(remove(iRange, tRange, envir = .GlobalEnv))
   intensity <- NULL
   mzGrid <- NULL
@@ -61,7 +62,7 @@ getSumSpectrum <- function(mzObj, ppmTol = NULL, iStart = NULL, iStop = NULL, tS
 
   #Normalize
   if(normalize){
-    normIntensity <- .normalizeSpectrum_dt(mzDt = sumSpec)
+    normIntensity <- .normalizeSpectrum_dt(mzDt = sumSpec, method)
     sumSpec[, intensity := NULL]
     sumSpec[, intensity := normIntensity]
   }

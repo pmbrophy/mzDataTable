@@ -12,7 +12,9 @@ getXIC(
   iStart = NULL,
   iStop = NULL,
   tStart = NULL,
-  tStop = NULL
+  tStop = NULL,
+  normalize = FALSE,
+  method
 )
 }
 \arguments{
@@ -37,6 +39,10 @@ Default = NULL.}
 
 \item{tStop}{Optional. The numeric time value to stop extracting ions.
 Default = NULL.}
+
+\item{normalize}{Logical. Default = FALSE. Should the data be normalized?}
+
+\item{method}{the normalization method. "maxPeak", "sum", or "sqrt".}
 }
 \value{
 Returns a subset of the original mzObj as a data.table
