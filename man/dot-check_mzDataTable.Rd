@@ -7,10 +7,10 @@
 .check_mzDataTable(mzDt)
 }
 \arguments{
-\item{mzDt}{a data.table}
+\item{mzDt}{a data.table or a disk.frame}
 }
 \value{
-
+return `TRUE` for data.table and `FALSE` for disk.frame
 }
 \description{
 Check mzDt for data structure

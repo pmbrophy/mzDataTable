@@ -1,8 +1,8 @@
 #' Check mzDt for data structure
 #'
-#' @param mzDt a data.table
+#' @param mzDt a data.table or a disk.frame
 #'
-#' @return
+#' @return return `TRUE` for data.table and `FALSE` for disk.frame
 #' @export
 #'
 
@@ -44,6 +44,10 @@
   if(err){
     stop(msg)
   }else{
-    NULL
+    if(isDataTable){
+      TRUE
+    }else{
+      FALSE
+    }
   }
 }
