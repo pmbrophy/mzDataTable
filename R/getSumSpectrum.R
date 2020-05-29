@@ -36,9 +36,11 @@ getSumSpectrum <- function(mzObj, ppmTol = NULL, iStart = NULL, iStop = NULL, tS
   if(is.null(ppmTol) & isCentroid){
     stop("Mass accuracy in ppm must be provided for centered data.")
   }
-
-  iRange <<- c(iStart, iStop)
-  tRange <<- c(tStart, tStop)
+  #Calculate ranges to extract (create local, export global for `future`)
+  iRange <- .getiRange(mzObj, iStart, iStop)
+  tRange <- .gettRange(mzObj, tStart, tStop)
+  iRange <<- iRange
+  tRange <<- tRange
 
   #Subset by time
   if(isDataTable){
@@ -55,6 +57,7 @@ getSumSpectrum <- function(mzObj, ppmTol = NULL, iStart = NULL, iStop = NULL, tS
 
   #Sum each grid
   sumSpec <- sumSpec[, list(intensity = sum(intensity)), by = list(mzGrid_index, mzGrid)]
+  data.table::setnames(x = sumSpec, old = "mzGrid", new = "mz")
 
   #Normalize
   if(normalize){
@@ -86,11 +89,8 @@ getSumSpectrum <- function(mzObj, ppmTol = NULL, iStart = NULL, iStop = NULL, tS
   tRangeIsValid <- !is.null(tRange) & .inGlobalEnv(varNames = "tRange")
   iRangeIsValid <- !is.null(iRange) & .inGlobalEnv(varNames = "iRange")
 
-  if(tRangeIsValid){
-    #Filter time by retentionTime
-    sumSpec <- mzDskF[retentionTime %between% tRange,
-                      keep = c("mz", "retentionTime", "intensity")]
-    sumSpec[, retentionTime := NULL]
+  if(iRangeIsValid & tRangeIsValid){
+    stop("iStart/iStop and tStart/tStop cannot both be specified")
 
   }else if(iRangeIsValid){
     #Filter time by seqNum
@@ -98,8 +98,11 @@ getSumSpectrum <- function(mzObj, ppmTol = NULL, iStart = NULL, iStop = NULL, tS
                       keep = c("mz", "seqNum", "intensity")]
     sumSpec[, seqNum := NULL]
 
-  }else if(iRangeIsValid & tRangeIsValid){
-    stop("iStart/iStop and tStart/tStop cannot both be specified")
+  }else if(tRangeIsValid){
+    #Filter time by retentionTime
+    sumSpec <- mzDskF[retentionTime %between% tRange,
+                      keep = c("mz", "retentionTime", "intensity")]
+    sumSpec[, retentionTime := NULL]
 
   }else{
     #Do not filter time
@@ -130,16 +133,16 @@ getSumSpectrum <- function(mzObj, ppmTol = NULL, iStart = NULL, iStop = NULL, tS
   tRangeIsValid <- !is.null(tRange) & .inGlobalEnv(varNames = "tRange")
   iRangeIsValid <- !is.null(iRange) & .inGlobalEnv(varNames = "iRange")
 
-  if(tRangeIsValid){
-    #Filter time by retentionTime
-    sumSpec <- mzDt[retentionTime %between% tRange, list(mz, intensity)]
+  if(iRangeIsValid & tRangeIsValid){
+    stop("iStart/iStop and tStart/tStop cannot both be specified")
 
   }else if(iRangeIsValid){
     #Filter time by seqNum
     sumSpec <- mzDt[seqNum %between% iRange, list(mz, intensity)]
 
-  }else if(iRangeIsValid & tRangeIsValid){
-    stop("iStart/iStop and tStart/tStop cannot both be specified")
+  }else if(tRangeIsValid){
+    #Filter time by retentionTime
+    sumSpec <- mzDt[retentionTime %between% tRange, list(mz, intensity)]
 
   }else{
     #Do not filter time

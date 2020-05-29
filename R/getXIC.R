@@ -40,10 +40,13 @@ getXIC <- function(mzObj, mz, mz_delta = NULL, ppmTol = NULL, iStart = NULL, iSt
   #Check data.table
   isDataTable <- .check_mzDataTable(mzObj)
 
-  #Calculate ranges to extract
-  mzRange <<- .getMzRange(mz, mz_delta, ppmTol)
-  iRange <<- .getiRange(mzObj, iStart, iStop)
-  tRange <<- .gettRange(mzObj, tStart, tStop)
+  #Calculate ranges to extract (create local, export global for `future`)
+  mzRange <- .getMzRange(mz, mz_delta, ppmTol)
+  iRange <- .getiRange(mzObj, iStart, iStop)
+  tRange <- .gettRange(mzObj, tStart, tStop)
+  mzRange <<- mzRange
+  iRange <<- iRange
+  tRange <<- tRange
 
   #Do the extraction
   if(isDataTable){
@@ -77,15 +80,13 @@ getXIC <- function(mzObj, mz, mz_delta = NULL, ppmTol = NULL, iStart = NULL, iSt
   seqNum <- NULL
   retentionTime <- NULL
 
-  tRangeIsValid <- !is.null(tRange) & .inGlobalEnv(varNames = "tRange")
-  iRangeIsValid <- !is.null(iRange) & .inGlobalEnv(varNames = "iRange")
+  mzRangeIsValid <- !is.null(mzRange) & .inGlobalEnv(varNames = "mzRange")
+  tRangeIsValid <- (!is.null(tRange) & .inGlobalEnv(varNames = "tRange")) & mzRangeIsValid
+  iRangeIsValid <- (!is.null(iRange) & .inGlobalEnv(varNames = "iRange")) & mzRangeIsValid
 
-  if(tRangeIsValid){
+  if(tRangeIsValid & iRangeIsValid){
     #Filter time by retentionTime
-    xic <- mzDskF[mz %between% mzRange & retentionTime %between% tRange,
-                list(sumIntensity = sum(intensity)),
-                by = list(seqNum, retentionTime),
-                keep = c("mz", "seqNum", "intensity", "retentionTime")]
+    stop("iStart/iStop and tStart/tStop cannot both be specified")
 
   }else if(iRangeIsValid){
     #Filter time by seqNum
@@ -94,15 +95,25 @@ getXIC <- function(mzObj, mz, mz_delta = NULL, ppmTol = NULL, iStart = NULL, iSt
                 by = list(seqNum, retentionTime),
                 keep = c("mz", "seqNum", "intensity", "retentionTime")]
 
-  }else if(iRangeIsValid & tRangeIsValid){
-    stop("iStart/iStop and tStart/tStop cannot both be specified")
+  }else if(tRangeIsValid){
+    xic <- mzDskF[mz %between% mzRange & retentionTime %between% tRange,
+                  list(sumIntensity = sum(intensity)),
+                  by = list(seqNum, retentionTime),
+                  keep = c("mz", "seqNum", "intensity", "retentionTime")]
 
   }else{
     #Do not filter time
-    xic <- mzDskF[mz %between% mzRange,
-                list(intensity = sum(intensity)),
-                by = list(seqNum, retentionTime),
-                keep = c("mz", "seqNum", "intensity", "retentionTime")]
+    if(mzRangeIsValid){
+      #Filter mz
+      xic <- mzDskF[mz %between% mzRange,
+                    list(intensity = sum(intensity)),
+                    by = list(seqNum, retentionTime),
+                    keep = c("mz", "seqNum", "intensity", "retentionTime")]
+    }else{
+      stop("filters not specified")
+
+    }
+
   }
 
   #Return
@@ -127,14 +138,12 @@ getXIC <- function(mzObj, mz, mz_delta = NULL, ppmTol = NULL, iStart = NULL, iSt
   seqNum <- NULL
   retentionTime <- NULL
 
-  tRangeIsValid <- !is.null(tRange) & .inGlobalEnv(varNames = "tRange")
-  iRangeIsValid <- !is.null(iRange) & .inGlobalEnv(varNames = "iRange")
+  mzRangeIsValid <- !is.null(mzRange) & .inGlobalEnv(varNames = "mzRange")
+  tRangeIsValid <- (!is.null(tRange) & .inGlobalEnv(varNames = "tRange")) & mzRangeIsValid
+  iRangeIsValid <- (!is.null(iRange) & .inGlobalEnv(varNames = "iRange")) & mzRangeIsValid
 
-  if(tRangeIsValid){
-    #Filter time by retentionTime
-    xic <- mzDt[mz %between% mzRange & retentionTime %between% tRange,
-                list(sumIntensity = sum(intensity)),
-                by = list(seqNum, retentionTime)]
+  if(tRangeIsValid & iRangeIsValid){
+    stop("iStart/iStop and tStart/tStop cannot both be specified")
 
   }else if(iRangeIsValid){
     #Filter time by seqNum
@@ -142,14 +151,19 @@ getXIC <- function(mzObj, mz, mz_delta = NULL, ppmTol = NULL, iStart = NULL, iSt
                 list(sumIntensity = sum(intensity)),
                 by = list(seqNum, retentionTime)]
 
-  }else if(iRangeIsValid & tRangeIsValid){
-    stop("iStart/iStop and tStart/tStop cannot both be specified")
+  }else if(tRangeIsValid){
+    #Filter time by retentionTime
+    xic <- mzDt[mz %between% mzRange & retentionTime %between% tRange,
+                list(sumIntensity = sum(intensity)),
+                by = list(seqNum, retentionTime)]
 
   }else{
-    #Do not filter time
-    xic <- mzDt[mz %between% mzRange,
-                list(intensity = sum(intensity)),
-                by = list(seqNum, retentionTime)]
+    if(mzRangeIsValid){
+      #Do not filter time
+      xic <- mzDt[mz %between% mzRange,
+                  list(intensity = sum(intensity)),
+                  by = list(seqNum, retentionTime)]
+    }
   }
 
   #Return
