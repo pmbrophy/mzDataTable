@@ -29,7 +29,7 @@
 
 #' Get index range from `seqNum`
 #'
-#' @param mzObj either a data.table or disk.frame
+#' @param mzObj either a data.table or disk.frame.
 #' @param iStart The integer start index to begin extracting ions.
 #' @param iStop The integer stop index stop extracting ions.
 #'
@@ -67,4 +67,17 @@
   }
 
   c(tStart, tStop)
+}
+
+
+#' Check if all objects are in .GlobalEnv
+#'
+#' @param varNames a character vector of any length providing variable names
+#'
+#' @return logical vector of length one
+#'
+
+.inGlobalEnv <- function(varNames){
+  inGlobal <- sapply(X = varNames, FUN = exists, where = .GlobalEnv)
+  all(inGlobal)
 }

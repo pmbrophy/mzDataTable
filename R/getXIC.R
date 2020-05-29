@@ -72,8 +72,8 @@ getXIC <- function(mzObj, mz, mz_delta = NULL, ppmTol = NULL, iStart = NULL, iSt
 #'
 
 .getXIC_dskF <- function(mzDskF, mzRange, iRange, tRange){
-  tRangeIsValid <- !is.null(tRange)
-  iRangeIsValid <- !is.null(iRange)
+  tRangeIsValid <- !is.null(tRange) & .inGlobalEnv(varNames = "tRange")
+  iRangeIsValid <- !is.null(iRange) & .inGlobalEnv(varNames = "iRange")
 
   if(tRangeIsValid){
     #Filter time by retentionTime
@@ -117,8 +117,8 @@ getXIC <- function(mzObj, mz, mz_delta = NULL, ppmTol = NULL, iStart = NULL, iSt
 #'
 
 .getXIC_dt <- function(mzDt, mzRange, iRange, tRange){
-  tRangeIsValid <- !is.null(tRange)
-  iRangeIsValid <- !is.null(iRange)
+  tRangeIsValid <- !is.null(tRange) & .inGlobalEnv(varNames = "tRange")
+  iRangeIsValid <- !is.null(iRange) & .inGlobalEnv(varNames = "iRange")
 
   if(tRangeIsValid){
     #Filter time by retentionTime
