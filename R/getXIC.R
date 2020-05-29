@@ -55,7 +55,7 @@ getXIC <- function(mzObj, mz, mz_delta = NULL, ppmTol = NULL, iStart = NULL, iSt
 
   #Cleanup
   remove(mzRange, iRange, tRange, envir = .GlobalEnv)
-  setkey(x = xic, physical = TRUE, "seqNum")
+  data.table::setkey(x = xic, physical = TRUE, "seqNum")
   xic
 }
 
