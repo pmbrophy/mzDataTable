@@ -2,7 +2,7 @@
 
 export(.check_mzDataTable)
 export(C_normCentroidMz)
-export(getBPI_dt)
+export(getBPI)
 export(getSumSpectrum_dt)
 export(getTIC)
 export(getXIC)
