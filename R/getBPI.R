@@ -37,7 +37,7 @@ getBPI <- function(mzObj, normalize = FALSE){
 
 #' Calculate total ion chromatogram from disk.frame
 #'
-#' @details Internal function used by getTIC to calculate TIC from disk.frame.
+#' @details Internal function used by getTIC to calculate BPI from disk.frame.
 #'
 #' @param mzDskF a disk.frame imported from mzML/mzXML file.
 #'
@@ -60,9 +60,9 @@ getBPI <- function(mzObj, normalize = FALSE){
 
 #' Calculate total ion chromatogram from data.table
 #'
-#' @param mzDt a data.table imported from mzML/mzXML file.
+#' @details Internal function used by getTIC to calculate BPI from data.table.
 #'
-#' @details Internal function used by getTIC to calculate TIC from data.table.
+#' @param mzDt a data.table imported from mzML/mzXML file.
 #'
 #' @return returns a data.table.
 #'
