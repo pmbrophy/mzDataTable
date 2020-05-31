@@ -14,6 +14,7 @@
 #' @export
 #'
 .normalizeSpectrum_dt <- function(mzDt, method){
+  #TODO: This function retunrs intensity rather than modifying in place... This should be updated. 
   intensity <- NULL
   if(method == "maxPeak"){
     #Divide each point by max intensity
@@ -57,17 +58,15 @@
   intensity <- NULL
   if(method == "maxPeak"){
     #Divide each point by max intensity
-    mzDt[, list(intensity_norm = intensity/max(intensity)), by = seqNum]
+    mzDt[, intensity_norm := intensity, by = seqNum]
     
   }else if(method == "sqrt"){
     #Square root intensity transform
-    mzDt <- mzDt[, list(intensity_norm = sqrt(intensity)/sqrt(sum(intensity))), by = seqNum]
-    mzDt/max(mzDt)
+    mzDt[, intensity_norm := sqrt(intensity)/sqrt(sum(intensity)), by = seqNum]
     
   }else if(method == "sum"){
     #Divide each peak by sum total intensity
-    mzDt[, list(intensity_norm = intensity/sum(intensity)), by = seqNum]
-    mzDt/max(mzDt)
+    mzDt[, intensity_norm := intensity/sum(intensity), by = seqNum]
     
   }else if(is.null(method)){
     stop("method param is NULL")
@@ -76,4 +75,7 @@
     stop("supplied method param is not supported")
     
   }
+  #normalize to 1
+  mzDt[, intensity_norm := intensity_norm/max(intensity_norm), by = seqNum]
+  mzDt
 }
