@@ -15,5 +15,10 @@
 returns mzDt with extra column `intensity_norm`
 }
 \description{
-Normalize a mzDt by one of the available methods.
+Normalize intensity of mzDt by one of the available methods.
+}
+\details{
+"maxPeak": divide intensity by the max intensity.
+  "sqrt": divide intensity using sqrt intensity transform.
+  "sum" : divide intensity by sum intensity.
 }

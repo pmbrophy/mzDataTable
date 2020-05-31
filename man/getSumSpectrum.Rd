@@ -12,7 +12,7 @@ getSumSpectrum(
   tStart = NULL,
   tStop = NULL,
   normalize = FALSE,
-  method,
+  method = "sqrt",
   isCentroid = TRUE
 )
 }

@@ -14,7 +14,7 @@ getXIC(
   tStart = NULL,
   tStop = NULL,
   normalize = FALSE,
-  method
+  method = "sqrt"
 )
 }
 \arguments{

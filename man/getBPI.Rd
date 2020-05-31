@@ -4,7 +4,7 @@
 \alias{getBPI}
 \title{Get Base Peak Intensity}
 \usage{
-getBPI(mzObj, normalize = FALSE, method)
+getBPI(mzObj, normalize = FALSE, method = "sqrt")
 }
 \arguments{
 \item{mzObj}{a data.table or disk.frame imported from mzML/mzXML file.}
