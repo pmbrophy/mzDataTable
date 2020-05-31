@@ -1,3 +1,14 @@
+
+
+
+indexMasterSpectrum_pair <- function(mzDt, seqNums, ppmTol, isCentroid = TRUE){
+  indexedSpectra <- indexMasterSpectrum(mzDt = mzDt[seqNum %in% seqNums], 
+                                        ppmTol = ppmTol, 
+                                        isCentroid = isCentroid)
+  
+  indexedSpectra[, seqNum_pair := paste0(seqNums, collapse = "-")]
+}
+
 #' Index the m/z axis
 #'
 #' @description Index the m/z axis for a set of mass spectra. Function outputs
@@ -17,16 +28,6 @@
 
 indexMasterSpectrum <- function(mzDt, ppmTol, isCentroid = TRUE){
   mz <- NULL
-
-  #Input checks
-  notDataTable <- !data.table::is.data.table(mzDt)
-  mzColMissing <- !("mz" %in% colnames(mzDt))
-
-  if(notDataTable){
-    stop("mzDt is not a data.table")
-  }else if(mzColMissing){
-    stop("mzDt does not contain a column named 'mz'")
-  }
 
   #Do the Gridding: Both return at least:
   # "mzGrid" - the m/z values of each grid and
@@ -90,10 +91,7 @@ indexMasterSpectrum <- function(mzDt, ppmTol, isCentroid = TRUE){
 #'
 
 .C_normCentroidMz <- function(mz, ppmTol){
-  if(!is.numeric(mz)){
-    stop("mz is not numeric")
-  }
-
+  
   mz_length <- length(mz)
   index <- c(1:mz_length)
   tol <- ppmTol*(10^(-6))
