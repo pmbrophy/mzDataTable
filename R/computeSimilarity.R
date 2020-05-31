@@ -1,3 +1,35 @@
+#' Generate square similarity matrix
+#'
+#' @param simMat the matrix returned by computeSimilarity() or .specSim() containing columns "sim", "seqNum1", "seqNum2"
+#'
+#' @return Returns a square matrix
+#' @export
+#'
+#' @examples
+#' #See computeSimilarity
+
+similarity2SquareMatrix <- function(simMat){
+  seqNums <- unique(c(simMat[,"seqNum1"], simMat[,"seqNum2"])) #seqNum index for each col
+  dimSize <- length(seqNums)    #num cols
+  
+  #Square matrix (dimSize x dimSize) to store results
+  squareMat <- matrix(data = 0, nrow = dimSize, ncol = dimSize)
+  
+  #Convert seqNum to index to populate squareMat
+  rows <- match(x = simMat[,"seqNum1"], table = seqNums)
+  cols <- match(x = simMat[,"seqNum2"], table = seqNums)
+  result_loc <- cbind(rows, cols)
+  
+  
+  #Fill squareMat with similarity score values from simMat using result_loc indexs
+  squareMat[result_loc] <- simMat[, "sim"]
+  
+  #Fill in diagonal 
+  diag(x = squareMat) <- 1
+  
+  squareMat
+}
+
 #' Compute Spectral Similarity
 #'
 #' @param mzDt a data.table imported by mzML2dataTable() with columns `seqNum`, `mz`, `intensity`
@@ -13,38 +45,66 @@
 #'
 #' @examples
 #' dt <- mzML2dataTable(path = msdata::proteomics(full.names = TRUE)[3])
-#'  simMat <- computeSimilarity(mzDt = dt[msLevel == 2 & seqNum %between% c(1, 10)], 
-#'                              ppmTol = 100, 
-#'                              isCentroid = TRUE, 
-#'                              intensityMin = 0.01, 
-#'                              normalize = TRUE, 
-#'                              normalization_method = "sqrt", 
-#'                              similarity_method = NULL)
+#' simMat <- computeSimilarity(mzDt = dt[msLevel == 2 & seqNum %between% c(1, 10)], 
+#'                             ppmTol = 100, 
+#'                             isCentroid = TRUE, 
+#'                             intensityMin = 0.01, 
+#'                             normalize = TRUE, 
+#'                             normalization_method = "sqrt", 
+#'                             similarity_method = "specContrast")
+#' 
+#' squareMat <- similarity2SquareMatrix(simMat)
+#' image(squareMat)
 #' 
 
 computeSimilarity <- function(mzDt, ppmTol, isCentroid, intensityMin = 0, normalize = TRUE, normalization_method = "sqrt", similarity_method){
+  #Subset and filter
+  mzDt <- mzDt[intensity >= intensityMin, list(seqNum, mz, intensity)]
+  
   #Normalize intensity
   if(normalize){
-    normIntensity <- .normalizeSpectrum_dt(mzDt, normalization_method)
+    normIntensity <- .normalizeEachSpectrum_dt(mzDt = mzDt, method = normalization_method)
+    
     #Replace summed intensity with normalized summed intensity
     mzDt[, intensity := NULL]
-    mzDt[, intensity := normIntensity]
+    data.table::setnames(x = mzDt, old = "intensity_norm", new = "intensity")
   }
   
-  #Grid all spectra onto a single grid - filter intensity, only take necessary columns
-  mzDt_grid <- .normalizeEachSpectrum_dt(mzDt = mzDt[intensity >= intensityMin, list(seqNum, mz, intensity)], 
-                                         ppmTol = ppmTol, 
-                                         isCentroid = isCentroid) 
+  #Grid all spectra onto a single grid
+  mzDt <- indexMasterSpectrum(mzDt = mzDt, 
+                              ppmTol = ppmTol, 
+                              isCentroid = isCentroid) 
   
-  similarity <- .sim_dotProd(mzDt = mzDt_grid, similarity_method = similarity_method)
+  similarity <- .specSim(mzDt = mzDt, similarity_method = similarity_method)
   
   similarity
 }
 
 
-#TODO: Need to modularize to allow for multiple methods
-#Dot product method 
-.sim_dotProd <- function(mzDt, similarity_method){
+#' @title Calculate spectral similarity
+#'
+#' @description Calculate the spectral similarity using one of the available
+#'   methods. The mzDt containing n-unique seqNums is converted into a matrix
+#'   with n-columns. All unique combinations are calculated and returned. The
+#'   output can be further processed to a similarity matrix using
+#'   similarity2SquareMatrix(). mzDt should contain self-normalized spectra
+#'   (see: .normalizeEachSpectrum_dt()). Each spectrum should contain mzGrid and
+#'   mzGrid_index corresponding to the global mz grid (see:
+#'   indexMasterSpectrum()).
+#'
+#' @param mzDt the data.table containing two or more spectra to be compared.
+#' @param similarity_method choose one: "dotProd", "specContrast", "specCor",
+#'   "brayCurtis", "euclidean"
+#'
+#' @return returns a 3-column matrix containing the similarity score and
+#'   sequence numbers
+#'   
+
+.specSim <- function(mzDt, similarity_method){
+  if(!(similarity_method %in% c("dotProd", "specContrast", "specCor", "brayCurtis", "euclidean"))){
+    stop("Similarity method not implemented choose from: \"dotProd\", \"specContrast\", \"specCor\", \"brayCurtis\", \"euclidean\"")
+  }
+  
   seqNums <- unique(mzDt$seqNum) #seqNum index for each col
   ncols <- length(seqNums)    #num cols
   colIndexs <- c(1L:ncols)  #cols index
@@ -71,7 +131,7 @@ computeSimilarity <- function(mzDt, ppmTol, isCentroid, intensityMin = 0, normal
   #Calculate similarity: "dotProd", "specContrast", "specCor", "brayCurtis", "euclidean". 
   if(similarity_method == "dotProd"){
     
-    ##Dot Product Similarity 
+    ##Dot Product Similarity [0,1]
     for (i in comboIndexs) {
       result_loc[,1] <- i
       
@@ -87,14 +147,15 @@ computeSimilarity <- function(mzDt, ppmTol, isCentroid, intensityMin = 0, normal
     
   }else if(similarity_method == "specContrast"){
     
-    ##Spectral Contrast Angle
+    ##Spectral Contrast Angle [0,1]
     for (i in comboIndexs) {
       result_loc[,1] <- i
       
       col1 <- colCombos[1,i]
       col2 <- colCombos[2,i]
       
-      result[1] <- m[,col1] %*% m[,col2]
+      result[1] <- 1 - ((2*acos(m[,col1] %*% m[,col2]))/pi)
+      
       result[2] <- seqNums[col1]
       result[3] <- seqNums[col2]
       
@@ -103,14 +164,14 @@ computeSimilarity <- function(mzDt, ppmTol, isCentroid, intensityMin = 0, normal
     
   }else if(similarity_method == "specCor"){
     
-    ##Spectral Contrast Angle
+    ##Spectral correlation - pearson's r [-1,1]
     for (i in comboIndexs) {
       result_loc[,1] <- i
       
       col1 <- colCombos[1,i]
       col2 <- colCombos[2,i]
       
-      result[1] <- m[,col1] %*% m[,col2]
+      result[1] <- cor(x = m[,col1], y = m[,col2], method = "pearson")
       result[2] <- seqNums[col1]
       result[3] <- seqNums[col2]
       
@@ -119,14 +180,14 @@ computeSimilarity <- function(mzDt, ppmTol, isCentroid, intensityMin = 0, normal
     
   }else if(similarity_method == "brayCurtis"){
     
-    ##Spectral Contrast Angle
+    ##Bray-Curtis Distance [0,1]
     for (i in comboIndexs) {
       result_loc[,1] <- i
       
       col1 <- colCombos[1,i]
       col2 <- colCombos[2,i]
       
-      result[1] <- m[,col1] %*% m[,col2]
+      result[1] <- 1 - (sum(abs(m[,col1] - m[,col2])) / sum(m[,col1] + m[,col2]))
       result[2] <- seqNums[col1]
       result[3] <- seqNums[col2]
       
@@ -135,14 +196,14 @@ computeSimilarity <- function(mzDt, ppmTol, isCentroid, intensityMin = 0, normal
     
   }else if(similarity_method == "euclidean"){
     
-    ##Spectral Contrast Angle
+    ##Euclidean Distance
     for (i in comboIndexs) {
       result_loc[,1] <- i
       
       col1 <- colCombos[1,i]
       col2 <- colCombos[2,i]
       
-      result[1] <- m[,col1] %*% m[,col2]
+      result[1] <- 1 - sqrt(sum((m[,col1] - m[,col2])^2))
       result[2] <- seqNums[col1]
       result[3] <- seqNums[col2]
       
@@ -155,8 +216,18 @@ computeSimilarity <- function(mzDt, ppmTol, isCentroid, intensityMin = 0, normal
   sims
 }
 
-#Grid data to a maxrix with two or more columns (This is faster than doing it with 2 vectors)
-#Each seqNum gets its own column
+#' @title Grid spectra to equal lengths
+#'
+#' @description After global mz gridding of n-spectra with
+#'   indexMasterSpectrum(), fill matrix containing n-columns to generate
+#'   comparable spectra.
+#'
+#' @param mzDt A data.table minimally containing "intensity" and "mzGrid_index"
+#' @param seqNums Original spectra index values "seqNum" imported from mzML/mzXML files. 
+#'
+#' @return a matrix
+#'
+
 .grid_matrix <- function(mzDt, seqNums){
   nSeqNums <- length(seqNums)
   colIndexs <- c(1L:nSeqNums)
@@ -203,7 +274,7 @@ computeSimilarity <- function(mzDt, ppmTol, isCentroid, intensityMin = 0, normal
 
 
 
-computeSimilarity_pairMethod <- function(mzDt, ppmTol, isCentroid, intensityMin = 0, normalize = TRUE, method = "sqrt"){
+.computeSimilarity_pairMethod <- function(mzDt, ppmTol, isCentroid, intensityMin = 0, normalize = TRUE, method = "sqrt"){
   #Normalize intensity
   if(normalize){
     normIntensity <- .normalizeSpectrum_dt(mzDt, method)
