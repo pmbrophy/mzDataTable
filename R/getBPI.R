@@ -24,10 +24,11 @@ getBPI <- function(mzObj, normalize = FALSE, method = "sqrt"){
   }
 
   if(normalize){
-    normIntensity <- .normalizeSpectrum_dt(mzDt = BPI, method)
-    #Replace summed intensity with normalized summed intensity
+    BPI <- .normalizeSpectrum_dt(mzDt = BPI, method = method)
+    
+    #rename summed intensity with normalized summed intensity
     BPI[, intensity := NULL]
-    BPI[, intensity := normIntensity]
+    data.table::setnames(x = BPI, old = "intensity_norm", new = "intensity")
   }
 
   data.table::setkey(x = BPI, physical = TRUE, "seqNum")

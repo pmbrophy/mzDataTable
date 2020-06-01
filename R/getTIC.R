@@ -26,10 +26,11 @@ getTIC <- function(mzObj, normalize = FALSE, method = "sqrt"){
 
   #Option to normalize
   if(normalize){
-    normIntensity <- .normalizeSpectrum_dt(mzDt = TIC, method)
-    #Replace summed intensity with normalized summed intensity
+    TIC <- .normalizeSpectrum_dt(mzDt = TIC, method = method)
+    
+    #Rename summed intensity with normalized summed intensity
     TIC[, intensity := NULL]
-    TIC[, intensity := normIntensity]
+    data.table::setnames(x = TIC, old = "intensity_norm", new = "intensity")
   }
 
   #Sort

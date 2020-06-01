@@ -62,9 +62,10 @@ getSumSpectrum <- function(mzObj, ppmTol = NULL, iStart = NULL, iStop = NULL, tS
 
   #Normalize
   if(normalize){
-    normIntensity <- .normalizeSpectrum_dt(mzDt = sumSpec, method)
+    sumSpec <- .normalizeSpectrum_dt(mzDt = sumSpec, method = method)
+    
     sumSpec[, intensity := NULL]
-    sumSpec[, intensity := normIntensity]
+    data.table::setnames(x = sumSpec, old = "intensity_norm", new = "intensity")
   }
 
   data.table::setkey(x = sumSpec, physical = TRUE, "mzGrid_index")

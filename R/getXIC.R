@@ -61,10 +61,10 @@ getXIC <- function(mzObj, mz, mz_delta = NULL, ppmTol = NULL, iStart = NULL, iSt
   
   #Intensity normalization
   if(normalize){
-    normIntensity <- .normalizeSpectrum_dt(mzDt = BPI)
-    #Replace summed intensity with normalized summed intensity
+    BPI <- .normalizeSpectrum_dt(mzDt = BPI, method = method)
+    #Rename summed intensity with normalized summed intensity
     BPI[, intensity := NULL]
-    BPI[, intensity := normIntensity]
+    data.table::setnames(x = BPI, old = "intensity_norm", new = "intensity")
   }
   
   #Cleanup

@@ -1,34 +1,31 @@
 #' @title Normalize a mzDt
 #'
 #' @description Normalize intensity of mzDt by one of the available methods.
-#' 
-#' @details "maxPeak": divide intensity by the max intensity.
-#'   "sqrt": divide intensity using sqrt intensity transform.
-#'   "sum" : divide intensity by sum intensity. 
-#'   
+#'   Normalization is global rather than by scan.
+#'
+#' @details "maxPeak": divide intensity by the max intensity. "sqrt": divide
+#'   intensity using sqrt intensity transform. "sum" : divide intensity by sum
+#'   intensity.
+#'
 #' @param mzDt the mzDt to be normalized in place
 #' @param method "maxPeak", "sum", or "sqrt"
 #'
 #' @return returns mzDt with extra column `intensity_norm`
-#' 
-#' @export
 #'
+
 .normalizeSpectrum_dt <- function(mzDt, method){
-  #TODO: This function retunrs intensity rather than modifying in place... This should be updated. 
   intensity <- NULL
   if(method == "maxPeak"){
     #Divide each point by max intensity
-    mzDt[, list(intensity_norm = intensity/max(intensity))]
+    mzDt[, intensity_norm := intensity]
     
   }else if(method == "sqrt"){
     #Square root intensity transform
-    mzDt <- mzDt[, list(intensity_norm = sqrt(intensity)/sqrt(sum(intensity)))]
-    mzDt/max(mzDt)
+    mzDt[, intensity_norm := sqrt(intensity)/sqrt(sum(intensity))]
     
   }else if(method == "sum"){
     #Divide each peak by sum total intensity
-    mzDt[, list(intensity_norm = intensity/sum(intensity))]
-    mzDt/max(mzDt)
+    mzDt[, intensity_norm := intensity/sum(intensity)]
     
   }else if(is.null(method)){
     stop("method param is NULL")
@@ -37,6 +34,9 @@
     stop("supplied method param is not supported")
     
   }
+  #normalize to 1
+  mzDt[, intensity_norm := intensity_norm/max(intensity_norm)]
+  mzDt
 }
 
 #' @title Normalize a mzDt by seqNum
@@ -52,8 +52,8 @@
 #'
 #' @return returns mzDt with extra column `intensity_norm`
 #'
-#' @export
-#' 
+#'
+ 
 .normalizeEachSpectrum_dt <- function(mzDt, method){
   intensity <- NULL
   if(method == "maxPeak"){
