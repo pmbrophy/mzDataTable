@@ -271,9 +271,6 @@ computeSimilarity <- function(mzDt, ppmTol, isCentroid, intensityMin = 0, normal
   list(v1, v2)
 }
 
-
-
-
 .computeSimilarity_pairMethod <- function(mzDt, ppmTol, isCentroid, intensityMin = 0, normalize = TRUE, method = "sqrt"){
   #Normalize intensity
   if(normalize){
